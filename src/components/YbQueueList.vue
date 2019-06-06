@@ -1,10 +1,10 @@
 <template>
   <div>
     <pre
-      v-for="song in queue"
-      :key="song.title"
+      v-for="track in queue"
+      :key="track.title"
     >
-      {{ getSong(song) }}
+      {{ getTrack(track) }}
     </pre>
   </div>
 </template>
@@ -15,7 +15,7 @@ import { mapGetters } from 'vuex'
 export default {
   computed: {
     ...mapGetters({
-      getSong: 'getSongByReference',
+      getTrack: 'getTrackByReference',
     }),
 
     queue() {

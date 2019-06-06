@@ -1,20 +1,20 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import songs from '@/state/songs.json'
+import tracks from '@/state/tracks.json'
 import queue from '@/state/queue.json'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    songs,
+    tracks,
     queue,
   },
 
   getters: {
-    getSongByReference: state => songReference => ({
-      ...state.songs.find(song => song.title === songReference.title),
-      ...songReference,
+    getTrackByReference: state => trackReference => ({
+      ...state.tracks.find(track => track.title === trackReference.title),
+      ...trackReference,
     }),
   },
 })
