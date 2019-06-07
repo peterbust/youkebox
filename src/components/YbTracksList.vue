@@ -96,22 +96,22 @@ export default {
 }
 </script>
 
-<style module>
+<style lang="postcss" module>
   .wrapper {
     position: absolute;
     bottom: 0;
     width: 100%;
     height: 55%;
-  }
 
-  .wrapper::before {
-    content: "";
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 85%;
-    opacity: .7;
-    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-red) 100%);
+    &:before {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 85%;
+      opacity: .7;
+      background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-red) 100%);
+    }
   }
 
   .button {
