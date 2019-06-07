@@ -1,16 +1,15 @@
 <template>
   <div
     :class="[
-      $style.album,
-      $style['is-positioned'],
-      $style[`position-${index}`],
+      $style['album-cover'],
+      $style[positionClassName],
     ]"
   >
-    <p>
+    <!-- <p>
       {{ track.title }}
       <br>
       {{ track.artist }}
-    </p>
+    </p> -->
   </div>
 </template>
 
@@ -22,7 +21,7 @@ export default {
       required: true,
     },
 
-    index: {
+    positionClassName: {
       type: String,
       required: false,
       default: null,
@@ -32,56 +31,25 @@ export default {
 </script>
 
 <style module>
-  .album {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .album-cover {
     position: absolute;
-    width: 20rem;
-    height: 20rem;
-    box-shadow: .5rem .5rem .25rem 0px rgba(0, 0, 0, .25);
+    bottom: -175%;
+    left: 42.5%;
+    width: 15%;
+    padding-bottom: 15%;
     background: black;
-    bottom: -30rem;
-    left: 40rem;
-    text-align: center;
-  }
-
-  .is-positioned {
     transition: all 500ms cubic-bezier(.25, .46, .45, .94);
   }
 
-  .position--3 {
-    bottom: -30rem;
-    left: -20rem;
-  }
+  .is-active { transform: translate(0, -440%) scale(1.5); }
 
-  .position--2 {
-    bottom: 5rem;
-    left: 0;
-  }
+  .is-previous-1 { transform: translate(-140%, -420%); }
+  .is-previous-2 { transform: translate(-245%, -400%); }
+  .is-previous-3 { transform: translate(-350%, -380%); }
+  .is-previous-4 { transform: translate(-455%, -180%); }
 
-  .position--1 {
-    bottom: 10rem;
-    left: 20rem;
-  }
-
-  .position-active {
-    bottom: 15rem;
-    left: 40rem;
-  }
-
-  .position-1 {
-    bottom: 10rem;
-    left: 60rem;
-  }
-
-  .position-2 {
-    bottom: 5rem;
-    left: 80rem;
-  }
-
-  .position-3 {
-    bottom: -30rem;
-    left: 100rem;
-  }
+  .is-next-1 { transform: translate(140%, -420%); }
+  .is-next-2 { transform: translate(245%, -400%); }
+  .is-next-3 { transform: translate(350%, -380%); }
+  .is-next-4 { transform: translate(455%, -180%); }
 </style>

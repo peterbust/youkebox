@@ -1,11 +1,12 @@
 <template>
-  <div :class="$style.list">
+  <div :class="$style.wrapper">
     <YbTracksListItem
       v-for="(track, i) in tracks"
       :key="i"
       :track="track"
-      :index="getPosition(i)"
+      :position-class-name="getPositionClassName(i)"
     />
+    <button :class="$style.button" />
   </div>
 </template>
 
@@ -30,34 +31,34 @@ export default {
     positions() {
       const positions = {
         active: this.currentTrack,
-        1: this.currentTrack + 1,
-        2: this.currentTrack + 2,
-        3: this.currentTrack + 3,
-        [-1]: this.currentTrack - 1,
-        [-2]: this.currentTrack - 2,
-        [-3]: this.currentTrack - 3,
+        next: [],
+        previous: [],
       }
 
-      if (positions[-1] < 0) positions[-1] = this.tracks.length - Math.abs(positions[-1])
-      if (positions[-2] < 0) positions[-2] = this.tracks.length - Math.abs(positions[-2])
-      if (positions[-3] < 0) positions[-3] = this.tracks.length - Math.abs(positions[-3])
-
-      if (positions[1] > this.tracks.length - 1) {
-        positions[1] = Math.abs(this.tracks.length - positions[1])
+      for (let i = 1; i < 5; i += 1) {
+        positions.next.push(this.currentTrack + i)
+        positions.previous.push(this.currentTrack - i)
       }
 
-      if (positions[2] > this.tracks.length - 1) {
-        positions[2] = Math.abs(this.tracks.length - positions[2])
-      }
+      positions.next.forEach((value, i) => {
+        if (value > this.tracks.length - 1) {
+          positions.next[i] = Math.abs(this.tracks.length - value)
+        }
+      })
 
-      if (positions[3] > this.tracks.length - 1) {
-        positions[3] = Math.abs(this.tracks.length - positions[3])
-      }
+      positions.previous.forEach((value, i) => {
+        if (value < 0) {
+          positions.previous[i] = this.tracks.length - Math.abs(value)
+        }
+      })
 
       return positions
     },
   },
 
+  /**
+   * Set up event listeners
+   */
   mounted() {
     document.addEventListener('keyup', (evt) => {
       if (evt.key === 'ArrowLeft') {
@@ -74,25 +75,56 @@ export default {
 
   methods: {
     /**
-     * Return current position of track (if so)
-     * @param {number} trackIndex Index of the track
-     * @returns {string} Found position or null
+     * Return current position classname of track key
+     * @param {number} i Index of the track
+     * @returns {string} Class name or null
      */
-    getPosition(trackIndex) {
-      const isPositioned = Object.values(this.positions).includes(trackIndex)
-      return isPositioned ? getKeyByValue(this.positions, trackIndex) : null
+    getPositionClassName(i) {
+      if (this.positions.active === i) return 'is-active'
+
+      if (this.positions.next.includes(i)) {
+        return `is-next-${getKeyByValue(this.positions.next, i) + 1}`
+      }
+
+      if (this.positions.previous.includes(i)) {
+        return `is-previous-${getKeyByValue(this.positions.previous, i) + 1}`
+      }
+
+      return null
     },
   },
 }
 </script>
 
 <style module>
-  .list {
+  .wrapper {
     position: absolute;
     bottom: 0;
-    left: 50%;
-    width: 100rem;
-    height: 50%;
-    margin-left: -50rem;
+    width: 100%;
+    height: 55%;
+  }
+
+  .wrapper::before {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 85%;
+    opacity: .7;
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-red) 100%);
+  }
+
+  .button {
+    position: absolute;
+    right: 0;
+    bottom: 18%;
+    left: 0;
+    width: 5%;
+    padding-bottom: 5%;
+    border: none;
+    border-radius: 50%;
+    outline: none;
+    margin: 0 auto;
+    background-color: var(--color-green);
   }
 </style>
