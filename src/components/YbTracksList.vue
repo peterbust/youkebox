@@ -3,10 +3,18 @@
     <YbTracksListItem
       v-for="(track, i) in tracks"
       :key="i"
-      :track="track"
+      :thumbnail="track['thumbnail_url']"
       :position-class-name="getPositionClassName(i)"
     />
     <button :class="$style.button" />
+    <div :class="$style['text-wrapper']">
+      <p :class="$style.text">
+        {{ tracks[currentTrack].title }}
+      </p>
+      <p :class="$style.text">
+        {{ tracks[currentTrack].artist }}
+      </p>
+    </div>
   </div>
 </template>
 
@@ -14,12 +22,18 @@
 import YbTracksListItem from './YbTracksListItem.vue'
 import getKeyByValue from '@/utils'
 
+const makeKeyupEvent = (code, action) =>
+  document.addEventListener('keyup', (evt) => {
+    if (evt.code === code) action()
+  })
+
 export default {
   components: { YbTracksListItem },
 
   data() {
     return {
       currentTrack: 0,
+      isSelected: false,
     }
   },
 
@@ -29,47 +43,51 @@ export default {
     },
 
     positions() {
-      const positions = {
+      const noOfTracks = this.tracks.length
+      const obj = {
         active: this.currentTrack,
         next: [],
         previous: [],
       }
 
+      // Set next- and previous indexes (hardcoded 4 times)
       for (let i = 1; i < 5; i += 1) {
-        positions.next.push(this.currentTrack + i)
-        positions.previous.push(this.currentTrack - i)
+        obj.next.push(this.currentTrack + i)
+        obj.previous.push(this.currentTrack - i)
       }
 
-      positions.next.forEach((value, i) => {
-        if (value > this.tracks.length - 1) {
-          positions.next[i] = Math.abs(this.tracks.length - value)
-        }
+      // Correct next indexes larger then total number of tracks
+      obj.next.forEach((val, i) => {
+        if (val > noOfTracks - 1) obj.next[i] = Math.abs(noOfTracks - val)
       })
 
-      positions.previous.forEach((value, i) => {
-        if (value < 0) {
-          positions.previous[i] = this.tracks.length - Math.abs(value)
-        }
+      // Correct negative previous indexes
+      obj.previous.forEach((val, i) => {
+        if (val < 0) obj.previous[i] = noOfTracks - Math.abs(val)
       })
 
-      return positions
+      return obj
     },
   },
 
   /**
-   * Set up event listeners
+   * Set up key events
    */
-  mounted() {
-    document.addEventListener('keyup', (evt) => {
-      if (evt.key === 'ArrowLeft') {
-        if (this.currentTrack === 0) this.currentTrack = this.tracks.length - 1
-        else this.currentTrack -= 1
-      }
+  created() {
+    makeKeyupEvent('Space', () => {
+      this.isSelected = true
+    })
 
-      if (evt.key === 'ArrowRight') {
-        if (this.currentTrack === this.tracks.length - 1) this.currentTrack = 0
-        else this.currentTrack += 1
-      }
+    makeKeyupEvent('ArrowLeft', () => {
+      this.isSelected = false
+      if (this.currentTrack === 0) this.currentTrack = this.tracks.length - 1
+      else this.currentTrack -= 1
+    })
+
+    makeKeyupEvent('ArrowRight', () => {
+      this.isSelected = false
+      if (this.currentTrack === this.tracks.length - 1) this.currentTrack = 0
+      else this.currentTrack += 1
     })
   },
 
@@ -126,5 +144,21 @@ export default {
     outline: none;
     margin: 0 auto;
     background-color: var(--color-green);
+  }
+
+  .text-wrapper {
+    position: absolute;
+    bottom: 4%;
+    width: 100%;
+    text-align: center;
+  }
+
+  .text {
+    color: var(--color-white);
+    font-family: var(--font-semibold);
+    font-size: 1.5rem;
+    line-height: 1.75rem;
+
+    &:nth-child(2) { font-family: var(--font-regular); }
   }
 </style>

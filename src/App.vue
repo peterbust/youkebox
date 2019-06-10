@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <YbPlayer /> -->
-    <!-- <YbQueueList /> -->
+    <YbQueueList />
     <YbTracksList />
   </div>
 </template>
@@ -9,19 +9,21 @@
 <script>
 import YbTracksList from '@/components/YbTracksList.vue'
 // import YbPlayer from '@/components/YbPlayer.vue'
-// import YbQueueList from '@/components/YbQueueList.vue'
+import YbQueueList from '@/components/YbQueueList.vue'
 
 export default {
   components: {
     YbTracksList,
     // YbPlayer,
-    // YbQueueList,
+    YbQueueList,
   },
 }
 </script>
 
-<style>
+<style lang="postcss">
 :root {
+  --color-black: #000;
+  --color-white: #faf2ef;
   --color-blue: #182645;
   --color-green: #37c882;
   --color-red: #ed6a54;
@@ -69,5 +71,17 @@ body {
   background-image: url("./assets/pattern.png");
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  color: var(--color-blue);
+  background: var(--color-red);
+}
+
+.album-cover {
+  background-color: rgba(255,255,255,.05);
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 .75rem .4rem rgba(0,0,0,.1);
 }
 </style>

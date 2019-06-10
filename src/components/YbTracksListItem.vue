@@ -1,43 +1,38 @@
 <template>
   <div
+    class="album-cover"
     :class="[
-      $style['album-cover'],
+      $style['wrapper'],
       $style[positionClassName],
     ]"
-  >
-    <!-- <p>
-      {{ track.title }}
-      <br>
-      {{ track.artist }}
-    </p> -->
-  </div>
+    :style="{ backgroundImage: `url(${thumbnail})` }"
+  />
 </template>
 
 <script>
 export default {
   props: {
-    track: {
-      type: Object,
-      required: true,
-    },
-
     positionClassName: {
       type: String,
       required: false,
       default: null,
     },
+
+    thumbnail: {
+      type: String,
+      required: true,
+    },
   },
 }
 </script>
 
-<style module>
-  .album-cover {
+<style lang="postcss" module>
+  .wrapper {
     position: absolute;
     bottom: -175%;
     left: 42.5%;
     width: 15%;
     padding-bottom: 15%;
-    background: black;
     transition: all 500ms cubic-bezier(.25, .46, .45, .94);
   }
 

@@ -2,20 +2,17 @@
   "current": {
     "duration": 2.5,
     "remaining": 1,
-    "title": "Dreams.mov"
+    "title": "Dreams"
   },
   "queue": [
     {
       "duration": 2.1,
-      "title": "Come take my hand.mp4"
+      "title": "Come take my hand"
     },
     {
       "duration": 3.2,
-      "title": "No Limit.mov"
-    },
-    {
-      "duration": 2.4,
-      "title": "California Love.mp4"
-    }
+      "title": "No Limit"
+    }, 
+    {}
   ]
 }
