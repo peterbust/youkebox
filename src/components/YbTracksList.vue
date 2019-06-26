@@ -5,8 +5,12 @@
       :key="i"
       :thumbnail="track['thumbnail_url']"
       :position-class-name="getPositionClassName(i)"
+      :select="select"
     />
-    <button :class="$style.button" />
+    <button
+      :class="[$style.button, select ? $style['is-active'] : '']"
+      @click="select = !select"
+    />
     <div :class="$style['text-wrapper']">
       <p :class="$style.text">
         {{ tracks[currentTrack].title }}
@@ -33,7 +37,7 @@ export default {
   data() {
     return {
       currentTrack: 0,
-      isSelected: false,
+      select: false,
     }
   },
 
@@ -70,25 +74,10 @@ export default {
     },
   },
 
-  /**
-   * Set up key events
-   */
   created() {
-    makeKeyupEvent('Space', () => {
-      this.isSelected = true
-    })
-
-    makeKeyupEvent('ArrowLeft', () => {
-      this.isSelected = false
-      if (this.currentTrack === 0) this.currentTrack = this.tracks.length - 1
-      else this.currentTrack -= 1
-    })
-
-    makeKeyupEvent('ArrowRight', () => {
-      this.isSelected = false
-      if (this.currentTrack === this.tracks.length - 1) this.currentTrack = 0
-      else this.currentTrack += 1
-    })
+    makeKeyupEvent('Space', () => this.toggleSelected())
+    makeKeyupEvent('ArrowLeft', () => this.navigatePrevious())
+    makeKeyupEvent('ArrowRight', () => this.navigateNext())
   },
 
   methods: {
@@ -109,6 +98,34 @@ export default {
       }
 
       return null
+    },
+
+    /**
+     * Navigate to the next track
+     * @returns {undefined}
+     */
+    navigateNext() {
+      this.toggleSelected(false)
+      if (this.currentTrack === this.tracks.length - 1) this.currentTrack = 0
+      else this.currentTrack += 1
+    },
+
+    /**
+     * Navigate to the previous track
+     * @returns {undefined}
+     */
+    navigatePrevious() {
+      this.toggleSelected(false)
+      if (this.currentTrack === 0) this.currentTrack = this.tracks.length - 1
+      else this.currentTrack -= 1
+    },
+
+    /**
+     * Toggle selected value
+     * @returns {undefined}
+     */
+    toggleSelected(value = !this.select) {
+      this.select = value
     },
   },
 }
@@ -133,7 +150,9 @@ export default {
   }
 
   .button {
+    z-index: 1;
     position: absolute;
+    display: block;
     right: 0;
     bottom: 18%;
     left: 0;
@@ -144,6 +163,32 @@ export default {
     outline: none;
     margin: 0 auto;
     background-color: var(--color-green);
+    cursor: pointer;
+    transition: all 180ms cubic-bezier(.25, .46, .45, .94);
+
+    &:before,
+    &:after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: .25rem;
+      height: 1.75rem;
+      margin: auto;
+      background-color: var(--color-blue);
+      transition: all 180ms cubic-bezier(.25, .46, .45, .94);
+    }
+
+    &:after { transform: rotate(90deg); }
+  }
+
+  .button.is-active {
+    transform: scale(1.25);
+
+    &:before { transform: rotate(45deg); }
+    &:after { transform: rotate(135deg); }
   }
 
   .text-wrapper {
@@ -156,8 +201,7 @@ export default {
   .text {
     color: var(--color-white);
     font-family: var(--font-semibold);
-    font-size: 1.5rem;
-    line-height: 1.75rem;
+    font-size: var(--font-size-m);
 
     &:nth-child(2) { font-family: var(--font-regular); }
   }

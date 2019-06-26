@@ -1,20 +1,20 @@
 <template>
   <div id="app">
-    <!-- <YbPlayer /> -->
     <YbQueueList />
+    <YbPlayer />
     <YbTracksList />
   </div>
 </template>
 
 <script>
-import YbTracksList from '@/components/YbTracksList.vue'
-// import YbPlayer from '@/components/YbPlayer.vue'
+import YbPlayer from '@/components/YbPlayer.vue'
 import YbQueueList from '@/components/YbQueueList.vue'
+import YbTracksList from '@/components/YbTracksList.vue'
 
 export default {
   components: {
     YbTracksList,
-    // YbPlayer,
+    YbPlayer,
     YbQueueList,
   },
 }
@@ -30,6 +30,9 @@ export default {
   --font-light: 'Graphik Light', Helvetica, Arial, sans-serif;
   --font-regular: 'Graphik Regular', Helvetica, Arial, sans-serif;
   --font-semibold: 'Graphik Semibold', Helvetica, Arial, sans-serif;
+  --font-size-xl: 2.5vw;
+  --font-size-l: 2vw;
+  --font-size-m: 1.5vw;
 }
 
 @font-face {
@@ -71,6 +74,7 @@ body {
   background-image: url("./assets/pattern.png");
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.15;
 }
 
 ::selection {
