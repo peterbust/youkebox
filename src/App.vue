@@ -1,21 +1,21 @@
 <template>
   <div id="app">
-    <YbQueueList />
-    <YbPlayer />
+    <!-- <YbQueueList /> -->
+    <!-- <YbPlayer /> -->
     <YbTracksList />
   </div>
 </template>
 
 <script>
-import YbPlayer from '@/components/YbPlayer.vue'
-import YbQueueList from '@/components/YbQueueList.vue'
+// import YbPlayer from '@/components/YbPlayer.vue'
+// import YbQueueList from '@/components/YbQueueList.vue'
 import YbTracksList from '@/components/YbTracksList.vue'
 
 export default {
   components: {
+    // YbPlayer,
+    // YbQueueList,
     YbTracksList,
-    YbPlayer,
-    YbQueueList,
   },
 }
 </script>
@@ -25,7 +25,7 @@ export default {
   --color-black: #000;
   --color-white: #faf2ef;
   --color-blue: #182645;
-  --color-green: #37c882;
+  --color-green: #3BD487;
   --color-red: #ed6a54;
   --font-light: 'Graphik Light', Helvetica, Arial, sans-serif;
   --font-regular: 'Graphik Regular', Helvetica, Arial, sans-serif;

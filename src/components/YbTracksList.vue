@@ -4,21 +4,36 @@
       v-for="(track, i) in tracks"
       :key="i"
       :thumbnail="track['thumbnail_url']"
-      :position-class-name="getPositionClassName(i)"
+      :position-class-name="positionsGetClassName(i)"
       :select="select"
     />
     <button
       :class="[$style.button, select ? $style['is-active'] : '']"
       @click="select = !select"
     />
-    <div :class="$style['text-wrapper']">
-      <p :class="$style.text">
-        {{ tracks[currentTrack].title }}
-      </p>
-      <p :class="$style.text">
-        {{ tracks[currentTrack].artist }}
-      </p>
-    </div>
+    <transition name="fade">
+      <div
+        v-show="!select"
+        :class="$style['text-wrapper']"
+      >
+        <p :class="$style.text">
+          {{ tracks[positions.active].title }}
+        </p>
+        <p :class="$style.text">
+          {{ tracks[positions.active].artist }}
+        </p>
+      </div>
+    </transition>
+    <transition name="fade">
+      <div
+        v-show="select"
+        :class="$style['text-wrapper']"
+      >
+        <p :class="$style.text">
+          Add to queue?
+        </p>
+      </div>
+    </transition>
   </div>
 </template>
 
@@ -32,12 +47,18 @@ const makeKeyupEvent = (code, action) =>
   })
 
 export default {
-  components: { YbTracksListItem },
+  components: {
+    YbTracksListItem,
+  },
 
   data() {
     return {
-      currentTrack: 0,
       select: false,
+      positions: {
+        active: 0,
+        next: [1, 2, 3, 4],
+        previous: [-1, -2, -3, -4],
+      },
     }
   },
 
@@ -45,48 +66,59 @@ export default {
     tracks() {
       return this.$store.state.tracks
     },
-
-    positions() {
-      const noOfTracks = this.tracks.length
-      const obj = {
-        active: this.currentTrack,
-        next: [],
-        previous: [],
-      }
-
-      // Set next- and previous indexes (hardcoded 4 times)
-      for (let i = 1; i < 5; i += 1) {
-        obj.next.push(this.currentTrack + i)
-        obj.previous.push(this.currentTrack - i)
-      }
-
-      // Correct next indexes larger then total number of tracks
-      obj.next.forEach((val, i) => {
-        if (val > noOfTracks - 1) obj.next[i] = Math.abs(noOfTracks - val)
-      })
-
-      // Correct negative previous indexes
-      obj.previous.forEach((val, i) => {
-        if (val < 0) obj.previous[i] = noOfTracks - Math.abs(val)
-      })
-
-      return obj
-    },
   },
 
   created() {
+    this.positions.previous.forEach((val, i) => {
+      this.positions.previous[i] += this.tracks.length
+    })
     makeKeyupEvent('Space', () => this.toggleSelected())
-    makeKeyupEvent('ArrowLeft', () => this.navigatePrevious())
-    makeKeyupEvent('ArrowRight', () => this.navigateNext())
+    makeKeyupEvent('ArrowLeft', () => this.navigate(-1))
+    makeKeyupEvent('ArrowRight', () => this.navigate(1))
   },
 
   methods: {
     /**
-     * Return current position classname of track key
-     * @param {number} i Index of the track
-     * @returns {string} Class name or null
+     * Adds a given number to each array value within a minimum- and maximum value
+     * @param {array} array Array to handle
+     * @param {number} add Number to add
+     * @param {number} min Minimum value
+     * @param {number} max Maximum value
+     * @returns {array} Updated array
      */
-    getPositionClassName(i) {
+    addToEachInArray(array, add, min, max) {
+      array.forEach((val, i) => {
+        array[i] += add
+        if (array[i] >= max) array[i] -= max
+        if (array[i] < min) array[i] += max
+      })
+      return array
+    },
+
+    /**
+     * Adds a given number to positions object (component logic)
+     * @param {object} positions Positions to handle
+     * @param {number} add Number to add
+     * @param {number} max Maximum value
+     * @returns {object} Updated positions
+     */
+    positionsAdd(positions, add, max) {
+      positions.active += add
+      if (positions.active < 0) positions.active += max
+      if (positions.active >= max) positions.active -= max
+
+      positions.next = this.addToEachInArray(positions.next, add, 0, max)
+      positions.previous = this.addToEachInArray(positions.previous, add, 0, max)
+
+      return positions
+    },
+
+    /**
+     * Return related position classname of given track
+     * @param {number} i Index of the track
+     * @returns {string} Class name || null
+     */
+    positionsGetClassName(i) {
       if (this.positions.active === i) return 'is-active'
 
       if (this.positions.next.includes(i)) {
@@ -101,23 +133,13 @@ export default {
     },
 
     /**
-     * Navigate to the next track
+     * Navigate number of tracks
+     * @param {number} request Number to handle in positions
      * @returns {undefined}
      */
-    navigateNext() {
+    navigate(request) {
       this.toggleSelected(false)
-      if (this.currentTrack === this.tracks.length - 1) this.currentTrack = 0
-      else this.currentTrack += 1
-    },
-
-    /**
-     * Navigate to the previous track
-     * @returns {undefined}
-     */
-    navigatePrevious() {
-      this.toggleSelected(false)
-      if (this.currentTrack === 0) this.currentTrack = this.tracks.length - 1
-      else this.currentTrack -= 1
+      this.positions = this.positionsAdd(this.positions, request, this.tracks.length)
     },
 
     /**
@@ -132,77 +154,107 @@ export default {
 </script>
 
 <style lang="postcss" module>
-  .wrapper {
+.wrapper {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 55%;
+
+  &:before {
+    content: "";
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 55%;
-
-    &:before {
-      content: "";
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      height: 85%;
-      opacity: .7;
-      background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-red) 100%);
-    }
+    height: 85%;
+    opacity: .7;
+    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-red) 100%);
   }
+}
 
-  .button {
-    z-index: 1;
+.button {
+  z-index: 1;
+  position: absolute;
+  display: block;
+  right: 0;
+  bottom: 18%;
+  left: 0;
+  width: 5%;
+  padding-bottom: 5%;
+  border: none;
+  border-radius: 50%;
+  outline: none;
+  margin: 0 auto;
+  background-color: var(--color-green);
+  cursor: pointer;
+  transition: all 320ms cubic-bezier(.25, .46, .45, .94);
+
+  &:before,
+  &:after {
+    content: "";
     position: absolute;
-    display: block;
+    top: 0;
     right: 0;
-    bottom: 18%;
+    bottom: 0;
     left: 0;
-    width: 5%;
-    padding-bottom: 5%;
-    border: none;
-    border-radius: 50%;
-    outline: none;
-    margin: 0 auto;
-    background-color: var(--color-green);
-    cursor: pointer;
+    width: .3rem;
+    height: 1.75rem;
+    margin: auto;
+    background-color: var(--color-blue);
     transition: all 180ms cubic-bezier(.25, .46, .45, .94);
-
-    &:before,
-    &:after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      width: .25rem;
-      height: 1.75rem;
-      margin: auto;
-      background-color: var(--color-blue);
-      transition: all 180ms cubic-bezier(.25, .46, .45, .94);
-    }
-
-    &:after { transform: rotate(90deg); }
   }
 
-  .button.is-active {
-    transform: scale(1.25);
+  &:after {
+    transform: rotate(90deg);
+  }
+}
 
-    &:before { transform: rotate(45deg); }
-    &:after { transform: rotate(135deg); }
+.button.is-active {
+  transform: scale(1.25);
+
+  &:before {
+    left: 11px;
+    transform: rotate(45deg);
   }
 
-  .text-wrapper {
-    position: absolute;
-    bottom: 4%;
-    width: 100%;
-    text-align: center;
+  &:after {
+    top: 11px;
+    right: 14px;
+    height: .875rem;
+    transform: rotate(-45deg);
   }
+}
 
-  .text {
-    color: var(--color-white);
-    font-family: var(--font-semibold);
-    font-size: var(--font-size-m);
+.text-wrapper {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 18%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 
-    &:nth-child(2) { font-family: var(--font-regular); }
+.text {
+  color: var(--color-white);
+  font-family: var(--font-semibold);
+  font-size: var(--font-size-m);
+
+  &:nth-child(2) {
+    font-family: var(--font-regular);
   }
+}
+</style>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 320ms cubic-bezier(.25, .46, .45, .94);
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+  transform: translateY(100%);
+}
 </style>
