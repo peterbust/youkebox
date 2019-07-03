@@ -19,7 +19,7 @@
         {{ track.artist }}
       </h2>
     </div>
-    <p :class="$style['remaining-time']">
+    <p :class="$style['time-indicator']">
       {{ remainingTime }}
     </p>
   </div>
@@ -59,23 +59,30 @@ export default {
     calcProgressPercentage: (duration, remaining) => 100 / duration * remaining,
 
     /**
-     * Sets a minimum of two digits by prepending or appending a 0
+     * Sets a minimum of x digits
      * @param {number} n Number to handle
-     * @returns {string} Two digit string
+     * @param {number} minimumDigits Number of minimum digits
+     * @returns {string} Minimum digit string
      */
-    enforceTwoDigits: n => (`0${n}`).slice(-2),
+    enforceMinimumDigits(n, minimumDigits) {
+      let digitsToAdd = ''
+      for (let i = 0; i < minimumDigits; i += 1) digitsToAdd += '0'
+      return n.toString().length < minimumDigits
+        ? (digitsToAdd + n).slice(-minimumDigits)
+        : n.toString()
+    },
 
     /**
      * Calculates- and formats the remaining time
-     * @param {number} duration Total duration of track
-     * @param {number} remaining Remaining time left
+     * @param {number} duration Total duration of track in minutes
+     * @param {number} remaining Remaining time left in minutes
      * @returns {string} Remaining time as formatted string; `-xx:xx`
      */
-    formatRemainingTime(duration, remaining) {
-      const totalSeconds = (duration - remaining) * 60
-      const minutes = this.enforceTwoDigits(Math.floor(totalSeconds / 60))
-      const seconds = this.enforceTwoDigits(Math.floor(totalSeconds - (minutes * 60)))
-      return `-${minutes}:${seconds}`
+    formatRemainingTime(durationInMinutes, remainingTimeInMinutes) {
+      const totalSeconds = (durationInMinutes - remainingTimeInMinutes) * 60
+      const minutes = this.enforceMinimumDigits(Math.floor(totalSeconds / 60), 2)
+      const seconds = this.enforceMinimumDigits(Math.floor(totalSeconds - (minutes * 60)), 2)
+      return totalSeconds > 0 ? `-${minutes}:${seconds}` : '00:00'
     },
   },
 }
@@ -131,7 +138,7 @@ export default {
   font-size: var(--font-size-l);
 }
 
-.remaining-time {
+.time-indicator {
   position: absolute;
   right: 0;
   bottom: 7.5%;

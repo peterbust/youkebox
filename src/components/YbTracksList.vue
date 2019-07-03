@@ -39,12 +39,7 @@
 
 <script>
 import YbTracksListItem from './YbTracksListItem.vue'
-import getKeyByValue from '@/utils'
-
-const makeKeyupEvent = (code, action) =>
-  document.addEventListener('keyup', (evt) => {
-    if (evt.code === code) action()
-  })
+import { addToEachInArray, getKeyByValue, makeKeyupEvent } from '@/utils'
 
 export default {
   components: {
@@ -73,28 +68,11 @@ export default {
       this.positions.previous[i] += this.tracks.length
     })
     makeKeyupEvent('Space', () => this.toggleSelected())
-    makeKeyupEvent('ArrowLeft', () => this.navigate(-1))
-    makeKeyupEvent('ArrowRight', () => this.navigate(1))
+    makeKeyupEvent('ArrowLeft', () => this.positionsNavigate(-1))
+    makeKeyupEvent('ArrowRight', () => this.positionsNavigate(1))
   },
 
   methods: {
-    /**
-     * Adds a given number to each array value within a minimum- and maximum value
-     * @param {array} array Array to handle
-     * @param {number} add Number to add
-     * @param {number} min Minimum value
-     * @param {number} max Maximum value
-     * @returns {array} Updated array
-     */
-    addToEachInArray(array, add, min, max) {
-      array.forEach((val, i) => {
-        array[i] += add
-        if (array[i] >= max) array[i] -= max
-        if (array[i] < min) array[i] += max
-      })
-      return array
-    },
-
     /**
      * Adds a given number to positions object (component logic)
      * @param {object} positions Positions to handle
@@ -107,8 +85,8 @@ export default {
       if (positions.active < 0) positions.active += max
       if (positions.active >= max) positions.active -= max
 
-      positions.next = this.addToEachInArray(positions.next, add, 0, max)
-      positions.previous = this.addToEachInArray(positions.previous, add, 0, max)
+      positions.next = addToEachInArray(positions.next, add, 0, max)
+      positions.previous = addToEachInArray(positions.previous, add, 0, max)
 
       return positions
     },
@@ -137,7 +115,7 @@ export default {
      * @param {number} request Number to handle in positions
      * @returns {undefined}
      */
-    navigate(request) {
+    positionsNavigate(request) {
       this.toggleSelected(false)
       this.positions = this.positionsAdd(this.positions, request, this.tracks.length)
     },

@@ -1,20 +1,20 @@
 <template>
   <div id="app">
-    <!-- <YbQueueList /> -->
-    <!-- <YbPlayer /> -->
+    <YbQueueList />
+    <YbPlayer />
     <YbTracksList />
   </div>
 </template>
 
 <script>
-// import YbPlayer from '@/components/YbPlayer.vue'
-// import YbQueueList from '@/components/YbQueueList.vue'
+import YbPlayer from '@/components/YbPlayer.vue'
+import YbQueueList from '@/components/YbQueueList.vue'
 import YbTracksList from '@/components/YbTracksList.vue'
 
 export default {
   components: {
-    // YbPlayer,
-    // YbQueueList,
+    YbPlayer,
+    YbQueueList,
     YbTracksList,
   },
 }
@@ -70,7 +70,7 @@ export default {
 
 body {
   overflow: hidden;
-  background: var(--color-blue);
+  background-color: var(--color-blue);
   background-image: url("./assets/pattern.png");
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
