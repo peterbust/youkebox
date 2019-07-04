@@ -4,9 +4,10 @@
       Queue
     </h2>
     <YbQueueListItem
-      v-for="(track, i) in queued"
+      v-for="(track, i) in tracks"
       :key="i"
       :thumbnail="getTrack(track)['thumbnail_url']"
+      :show="tracksShow[i]"
     />
   </div>
 </template>
@@ -19,21 +20,56 @@ import store from '../store'
 export default {
   components: { YbQueueListItem },
 
+  data() {
+    return {
+      tracks: [],
+      tracksShow: new Array(3).fill(true),
+    }
+  },
+
   computed: {
     ...mapGetters({
       getTrack: 'getTrackByReference',
     }),
 
-    queued() {
+    stateQueue() {
       return this.$store.state.queue.queue
     },
   },
 
-  // Temp
-  mounted() {
+  watch: {
+    stateQueue(newObject, oldObject) {
+      this.onStateChangeAnimateUi(newObject, oldObject)
+    },
+  },
+
+  created() {
+    this.tracks = this.stateQueue
+    // Temp
     setTimeout(() => {
       store.dispatch('checkQueue')
-    }, 2000)
+    }, 2500)
+  },
+
+  methods: {
+    /**
+     * Handle state changes in queue (for animation)
+     * @param {object} newObject New state queue object
+     * @param {object} oldObject Old state queue object
+     * @returns {undefined}
+     */
+    onStateChangeAnimateUi(newObject, oldObject) {
+      for (let i = 0; i < 3; i += 1) {
+        if (newObject[i].title !== oldObject[i].title) {
+          this.$set(this.tracksShow, i, false)
+        }
+      }
+
+      setTimeout(() => {
+        this.tracks = this.stateQueue
+        this.tracksShow = this.tracksShow.map(show => true)
+      }, 280)
+    },
   },
 }
 </script>
