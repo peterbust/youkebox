@@ -16,6 +16,20 @@ const addToEachInArray = (array, add, min, max) => {
 }
 
 /**
+ * Sets a minimum of x digits
+ * @param {number} n Number to handle
+ * @param {number} minimumDigits Number of minimum digits
+ * @returns {string} Minimum digit string
+ */
+const enforceMinimumDigits = (n, minimumDigits) => {
+  let digitsToAdd = ''
+  for (let i = 0; i < minimumDigits; i += 1) digitsToAdd += '0'
+  return n.toString().length < minimumDigits
+    ? (digitsToAdd + n).slice(-minimumDigits)
+    : n.toString()
+}
+
+/**
  * Returns the key of a requested value in an object
  * @param {object} object Object to search in
  * @param {string} value Value to look for
@@ -41,6 +55,7 @@ const makeKeyupEvent = (code, action) => {
 
 export {
   addToEachInArray,
+  enforceMinimumDigits,
   getKeyByValue,
   makeKeyupEvent,
 }

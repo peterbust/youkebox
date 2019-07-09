@@ -45,6 +45,7 @@ export default {
 
   created() {
     this.tracks = this.stateQueue
+
     // Temp
     setTimeout(() => {
       store.dispatch('checkQueue')
@@ -67,7 +68,7 @@ export default {
 
       setTimeout(() => {
         this.tracks = this.stateQueue
-        this.tracksShow = this.tracksShow.map(show => true)
+        this.tracksShow = this.tracksShow.map(() => true)
       }, 280)
     },
   },

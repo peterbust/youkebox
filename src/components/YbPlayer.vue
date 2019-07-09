@@ -1,12 +1,16 @@
 <template>
   <div :class="$style['wrapper']">
-    <div
-      class="album-cover"
-      :class="$style['album-cover']"
-      :style="{ backgroundImage: `url(${track.thumbnail_url})` }"
-    />
+    <transition name="flip">
+      <div
+        v-show="thumbnailUrlShow"
+        class="album-cover"
+        :class="$style['album-cover']"
+        :style="{ backgroundImage: `url(${thumbnailUrl})` }"
+      />
+    </transition>
     <div :class="$style['time-bar']">
       <div
+        v-show="thumbnailUrlShow"
         :class="$style['time-bar-progress']"
         :style="{ width: `${progressInPercentage}%` }"
       />
@@ -27,8 +31,16 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import { enforceMinimumDigits } from '@/utils'
 
 export default {
+  data() {
+    return {
+      thumbnailUrl: '',
+      thumbnailUrlShow: true,
+    }
+  },
+
   computed: {
     ...mapGetters({
       getTrack: 'getTrackByReference',
@@ -47,6 +59,20 @@ export default {
         ? this.formatRemainingTime(this.track.duration, this.track.remaining)
         : '00:00'
     },
+
+    stateThumbnailUrl() {
+      return this.track.thumbnail_url
+    },
+  },
+
+  watch: {
+    stateThumbnailUrl() {
+      this.onStateChangeAnimateUi()
+    },
+  },
+
+  created() {
+    this.thumbnailUrl = this.stateThumbnailUrl
   },
 
   methods: {
@@ -59,20 +85,6 @@ export default {
     calcProgressPercentage: (duration, remaining) => 100 / duration * remaining,
 
     /**
-     * Sets a minimum of x digits
-     * @param {number} n Number to handle
-     * @param {number} minimumDigits Number of minimum digits
-     * @returns {string} Minimum digit string
-     */
-    enforceMinimumDigits(n, minimumDigits) {
-      let digitsToAdd = ''
-      for (let i = 0; i < minimumDigits; i += 1) digitsToAdd += '0'
-      return n.toString().length < minimumDigits
-        ? (digitsToAdd + n).slice(-minimumDigits)
-        : n.toString()
-    },
-
-    /**
      * Calculates- and formats the remaining time
      * @param {number} duration Total duration of track in minutes
      * @param {number} remaining Remaining time left in minutes
@@ -80,9 +92,22 @@ export default {
      */
     formatRemainingTime(durationInMinutes, remainingTimeInMinutes) {
       const totalSeconds = (durationInMinutes - remainingTimeInMinutes) * 60
-      const minutes = this.enforceMinimumDigits(Math.floor(totalSeconds / 60), 2)
-      const seconds = this.enforceMinimumDigits(Math.floor(totalSeconds - (minutes * 60)), 2)
+      const minutes = enforceMinimumDigits(Math.floor(totalSeconds / 60), 2)
+      const seconds = enforceMinimumDigits(Math.floor(totalSeconds - (minutes * 60)), 2)
       return totalSeconds > 0 ? `-${minutes}:${seconds}` : '00:00'
+    },
+
+    /**
+     * Handle state change album cover (for animation)
+     * @returns {undefined}
+     */
+    onStateChangeAnimateUi() {
+      this.thumbnailUrlShow = false
+
+      setTimeout(() => {
+        this.thumbnailUrl = this.stateThumbnailUrl
+        this.thumbnailUrlShow = true
+      }, 280)
     },
   },
 }
@@ -94,7 +119,7 @@ export default {
   top: 5.25%;
   right: 5%;
   width: 50%;
-  padding-bottom: 30px;
+  padding-bottom: 1.75%;
 }
 
 .album-cover {
@@ -105,7 +130,7 @@ export default {
 .time-bar {
   position: absolute;
   width: 100%;
-  height: 10px;
+  height: 3.75%;
   bottom: 0;
   background-color: var(--color-red);
   overflow: hidden;

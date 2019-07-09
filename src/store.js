@@ -16,11 +16,11 @@ export default new Vuex.Store({
 
   mutations: {
     updateCurrentRemainingTime(state) {
-      state.queue.current.remaining += (1 / 60) // eslint-disable-line
+      state.queue.current.remaining += (1 / 60)
     },
 
     setQueue(state, { newQueue }) {
-      state.queue = newQueue // eslint-disable-line
+      state.queue = newQueue
     },
   },
 
