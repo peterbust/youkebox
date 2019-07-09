@@ -12,7 +12,7 @@ module.exports = {
     'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     semi: ['error', 'never'],
-    'no-param-reassign': ['error', { 'props': false }],
+    'no-param-reassign': ['error', { props: false }],
   },
   parserOptions: {
     parser: 'babel-eslint',
