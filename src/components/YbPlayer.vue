@@ -130,7 +130,7 @@ export default {
 .time-bar {
   position: absolute;
   width: 100%;
-  height: 3.75%;
+  height: 2.5%;
   bottom: 0;
   background-color: var(--color-red);
   overflow: hidden;

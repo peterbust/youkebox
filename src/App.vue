@@ -1,5 +1,15 @@
 <template>
   <div id="app">
+    <video
+      width="100%"
+      autoplay
+      loop
+    >
+      <source
+        src="/assets/movies/bg.mp4"
+        type="video/mp4"
+      >
+    </video>
     <YbQueueList />
     <YbPlayer />
     <YbTracksList />
@@ -71,7 +81,7 @@ export default {
 body {
   overflow: hidden;
   background-color: var(--color-blue);
-  background-image: url("./assets/pattern.png");
+  /* background-image: url("./assets/pattern.png"); */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.15;
