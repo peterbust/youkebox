@@ -15,7 +15,6 @@
 <script>
 import { mapGetters } from 'vuex'
 import YbQueueListItem from './YbQueueListItem.vue'
-import store from '../store'
 
 export default {
   components: { YbQueueListItem },
@@ -45,11 +44,6 @@ export default {
 
   created() {
     this.tracks = this.stateQueue
-
-    // Temp
-    setTimeout(() => {
-      store.dispatch('checkQueue')
-    }, 2500)
   },
 
   methods: {
@@ -78,7 +72,7 @@ export default {
 <style lang="postcss" module>
 .wrapper {
   position: absolute;
-  top: 15%;
+  top: 13.75%;
   left: 5%;
   display: flex;
   flex-direction: row-reverse;
@@ -89,7 +83,7 @@ export default {
 
 .title {
   position: absolute;
-  top: -3.5rem;
+  top: -30%;
   left: 0;
   color: var(--color-red);
   font-family: var(--font-light);

@@ -1,7 +1,7 @@
 {
   "current": {
     "duration": 2.5,
-    "remaining": 2.5,
+    "remaining": 0,
     "title": "Dreams"
   },
   "queue": [
@@ -11,8 +11,8 @@
     },
     {
       "duration": 3.2,
-      "title": "No Limit"
-    }, 
+      "title": "Candy Shop"
+    },
     {}
   ]
 }

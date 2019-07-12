@@ -138,15 +138,15 @@ export default {
   width: 100%;
   height: 55%;
 
-  /* &:before {
+  &:before {
     content: "";
     position: absolute;
     bottom: 0;
     width: 100%;
     height: 85%;
-    opacity: .7;
+    opacity: .6;
     background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-red) 100%);
-  } */
+  }
 }
 
 .button {

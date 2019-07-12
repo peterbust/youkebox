@@ -4,12 +4,8 @@
       width="100%"
       autoplay
       loop
-    >
-      <source
-        src="/assets/movies/bg.mp4"
-        type="video/mp4"
-      >
-    </video>
+      src="/assets/movies/bg.mp4"
+    />
     <YbQueueList />
     <YbPlayer />
     <YbTracksList />
@@ -17,6 +13,7 @@
 </template>
 
 <script>
+import store from '@/store'
 import YbPlayer from '@/components/YbPlayer.vue'
 import YbQueueList from '@/components/YbQueueList.vue'
 import YbTracksList from '@/components/YbTracksList.vue'
@@ -26,6 +23,23 @@ export default {
     YbPlayer,
     YbQueueList,
     YbTracksList,
+  },
+
+  created() {
+    if (window.location.host !== 'localhost:8080') this.initDataRequests()
+  },
+
+  methods: {
+    /**
+     * Fetch tracks and repeatedly fetch queue
+     * @returns {undefined}
+     */
+    initDataRequests() {
+      store.dispatch('dataGet', { type: 'tracks' })
+      window.setInterval(() => {
+        store.dispatch('dataGet', { type: 'queue' })
+      }, 5000)
+    },
   },
 }
 </script>
@@ -78,10 +92,14 @@ export default {
     url('./assets/fonts/semibold.woff') format('woff');
 }
 
-body {
+body { background-color: var(--color-black); }
+
+#app {
+  position: absolute;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
   background-color: var(--color-blue);
-  /* background-image: url("./assets/pattern.png"); */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.15;

@@ -2,7 +2,7 @@
   <div :class="$style['wrapper']">
     <transition name="flip">
       <div
-        v-show="thumbnailUrlShow"
+        v-show="thumbnailShow"
         class="album-cover"
         :class="$style['album-cover']"
         :style="{ backgroundImage: `url(${thumbnailUrl})` }"
@@ -10,7 +10,7 @@
     </transition>
     <div :class="$style['time-bar']">
       <div
-        v-show="thumbnailUrlShow"
+        v-show="thumbnailShow"
         :class="$style['time-bar-progress']"
         :style="{ width: `${progressInPercentage}%` }"
       />
@@ -30,6 +30,7 @@
 </template>
 
 <script>
+import store from '@/store'
 import { mapGetters } from 'vuex'
 import { enforceMinimumDigits } from '@/utils'
 
@@ -37,7 +38,7 @@ export default {
   data() {
     return {
       thumbnailUrl: '',
-      thumbnailUrlShow: true,
+      thumbnailShow: true,
     }
   },
 
@@ -60,19 +61,20 @@ export default {
         : '00:00'
     },
 
-    stateThumbnailUrl() {
-      return this.track.thumbnail_url
+    stateTrackTitle() {
+      return this.track.title
     },
   },
 
   watch: {
-    stateThumbnailUrl() {
-      this.onStateChangeAnimateUi()
+    stateTrackTitle() {
+      this.onStateChangeAnimateThumbnail()
+      store.dispatch('handleRemainingTime')
     },
   },
 
   created() {
-    this.thumbnailUrl = this.stateThumbnailUrl
+    this.thumbnailUrl = this.track.thumbnail_url
   },
 
   methods: {
@@ -101,12 +103,12 @@ export default {
      * Handle state change album cover (for animation)
      * @returns {undefined}
      */
-    onStateChangeAnimateUi() {
-      this.thumbnailUrlShow = false
+    onStateChangeAnimateThumbnail() {
+      this.thumbnailShow = false
 
       setTimeout(() => {
-        this.thumbnailUrl = this.stateThumbnailUrl
-        this.thumbnailUrlShow = true
+        this.thumbnailUrl = this.track.thumbnail_url
+        this.thumbnailShow = true
       }, 280)
     },
   },
@@ -116,10 +118,9 @@ export default {
 <style lang="postcss" module>
 .wrapper {
   position: absolute;
-  top: 5.25%;
+  top: 8.5%;
   right: 5%;
   width: 50%;
-  padding-bottom: 1.75%;
 }
 
 .album-cover {
@@ -131,7 +132,7 @@ export default {
   position: absolute;
   width: 100%;
   height: 2.5%;
-  bottom: 0;
+  bottom: -7%;
   background-color: var(--color-red);
   overflow: hidden;
 }
@@ -147,7 +148,8 @@ export default {
   position: absolute;
   width: 57%;
   right: 10%;
-  bottom: 13%;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .title {
@@ -166,7 +168,7 @@ export default {
 .time-indicator {
   position: absolute;
   right: 0;
-  bottom: 7.5%;
+  bottom: -2%;
   color: var(--color-white);
   font-family: var(--font-light);
   font-size: var(--font-size-m);
