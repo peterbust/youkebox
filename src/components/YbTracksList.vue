@@ -98,21 +98,26 @@ export default {
 
     /**
      * Posts a track to add to the queue
+     * (Works on local environment without submitting to server)
      * @param {string} file Track property to post
      * @returns {undefined}
      */
     trackSubmit(file) {
-      axios.post(api.post.queue, { file })
-        .then(() => {
-          this.$store.commit('setTrackAvailability', {
-            trackKey: this.positions.active,
-            value: true,
+      const submitSuccess = () => {
+        this.$store.commit('setTrackAvailability', {
+          trackKey: this.positions.active,
+          value: true,
+        })
+        this.toggleSelected(false)
+      }
+
+      if (!this.$store.state.localEnv) {
+        axios.post(api.post.queue, { file })
+          .then(() => { submitSuccess() })
+          .catch(() => {
+            console.error('Oops, something went wrong submitting a song.')
           })
-          this.toggleSelected(false)
-        })
-        .catch(() => {
-          console.error('Oops, something went wrong submitting a song.')
-        })
+      } else submitSuccess()
     },
 
     /**

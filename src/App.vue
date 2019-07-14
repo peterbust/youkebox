@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <video
+    <!-- <video
       width="100%"
       autoplay
       loop
       src="/assets/movies/bg.mp4"
-    />
+    /> -->
     <YbQueueList />
     <YbPlayer />
     <YbTracksList />
@@ -17,6 +17,7 @@ import store from '@/store'
 import YbPlayer from '@/components/YbPlayer.vue'
 import YbQueueList from '@/components/YbQueueList.vue'
 import YbTracksList from '@/components/YbTracksList.vue'
+import queue2 from '@/state/queue2.json'
 
 export default {
   components: {
@@ -26,8 +27,13 @@ export default {
   },
 
   created() {
-    if (window.location.host !== 'localhost:8080') this.initDataRequests()
+    if (!store.state.localEnv) this.initDataRequests()
     setInterval(() => store.dispatch('checkDisabledTracks'), 10000)
+
+    // Mock queue commit for local environment
+    if (store.state.localEnv) {
+      setTimeout(() => this.$store.commit('set', { property: 'queue', data: queue2 }), 5000)
+    }
   },
 
   methods: {

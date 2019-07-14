@@ -15,6 +15,7 @@ export default new Vuex.Store({
     tracks,
     queue,
     disabled: [],
+    localEnv: window.location.host === 'localhost:8080',
   },
 
   mutations: {
