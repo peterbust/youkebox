@@ -1,11 +1,11 @@
 <template>
   <div id="app">
-    <!-- <video
+    <video
       width="100%"
       autoplay
       loop
       src="/assets/movies/bg.mp4"
-    /> -->
+    />
     <YbQueueList />
     <YbPlayer />
     <YbTracksList />
