@@ -6,48 +6,50 @@
       :thumbnail="track['thumbnail_url']"
       :position-class-name="positionsGetClassName(i)"
       :select="select"
+      :disabled="track.disabled"
     />
     <button
-      :class="[$style.button, select ? $style['is-active'] : '']"
+      :class="[
+        $style.button,
+        select ? $style['is-active'] : '',
+        tracks[positions.active].disabled ? $style['is-disabled'] : '',
+      ]"
       @click="select = !select"
     />
-    <transition name="fade">
-      <div
-        v-show="!select"
-        :class="$style['text-wrapper']"
-      >
-        <p :class="$style.text">
-          {{ tracks[positions.active].title }}
-        </p>
-        <p :class="$style.text">
-          {{ tracks[positions.active].artist }}
-        </p>
-      </div>
-    </transition>
-    <transition name="fade">
-      <div
-        v-show="select"
-        :class="$style['text-wrapper']"
-      >
-        <p :class="$style.text">
-          Add to queue?
-        </p>
-      </div>
-    </transition>
+    <YbTrackListMessage
+      :show="!select && !tracks[positions.active].disabled"
+      :messages="[tracks[positions.active].title, tracks[positions.active].artist]"
+    />
+    <YbTrackListMessage
+      :show="select"
+      :messages="['Add to queue?']"
+    />
+    <YbTrackListMessage
+      :show="tracks[positions.active].disabled"
+      :messages="['Available again later']"
+    />
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+import store from '@/store'
 import YbTracksListItem from './YbTracksListItem.vue'
+import YbTrackListMessage from './YbTrackListMessage.vue'
 import { addToEachInArray, getKeyByValue, makeKeyupEvent } from '@/utils'
+import api from '@/config/api'
+
+let timeout
 
 export default {
   components: {
     YbTracksListItem,
+    YbTrackListMessage,
   },
 
   data() {
     return {
+      disabled: [],
       select: false,
       positions: {
         active: 0,
@@ -63,16 +65,92 @@ export default {
     },
   },
 
+  watch: {
+    select() {
+      if (this.select) {
+        timeout = setTimeout(() => this.toggleSelected(false), 5000)
+      } else window.clearTimeout(timeout)
+    },
+  },
+
   created() {
     this.positions.previous.forEach((val, i) => {
       this.positions.previous[i] += this.tracks.length
     })
-    makeKeyupEvent('Space', () => this.toggleSelected())
-    makeKeyupEvent('ArrowLeft', () => this.positionsNavigate(-1))
-    makeKeyupEvent('ArrowRight', () => this.positionsNavigate(1))
+    this.initKeyEvents()
+    setInterval(() => this.disabledTracksCheck(), 10000)
   },
 
   methods: {
+    /**
+     * Sets up key events
+     * @returns {undefined}
+     */
+    initKeyEvents() {
+      makeKeyupEvent('Space', () => this.handleUserSelection())
+      makeKeyupEvent('ArrowLeft', () => this.positionsNavigate(-1))
+      makeKeyupEvent('ArrowRight', () => this.positionsNavigate(1))
+    },
+
+    /**
+     * Handles user selection of a track
+     * @returns {undefined}
+     */
+    handleUserSelection() {
+      if (!this.select) {
+        if (!this.tracks[this.positions.active].disabled) this.toggleSelected()
+      } else this.trackSubmit(this.tracks[this.positions.active].file)
+    },
+
+    /**
+     * Posts a track to add to the queue
+     * @param {string} file Track property to post
+     * @returns {undefined}
+     */
+    trackSubmit(file) {
+      axios.post(api.post.queue, { file })
+        .then(() => {
+          this.disabledTracksAdd(this.positions.active)
+          this.toggleSelected()
+        })
+        .catch(() => {
+          console.error('Oops, something went wrong submitting a song.')
+        })
+    },
+
+    /**
+     * Disables a track by updating the state
+     * @param {number} track Track key to disable
+     * @returns {undefined}
+     */
+    disabledTracksAdd(track) {
+      this.disabled.push({ track, timestamp: Date.now() })
+      store.commit('trackSetDisabled', { track, value: true })
+    },
+
+    /**
+     * Enable a track by updating the state
+     * @param {number} i Disabled key to remove
+     * @param {number} track Track key to disable
+     * @returns {undefined}
+     */
+    disabledTracksRemove(i, track) {
+      this.disabled.splice(i, 1)
+      store.commit('trackSetDisabled', { track, value: false })
+    },
+
+    /**
+     * Check disabled tracks
+     * @returns {undefined}
+     */
+    disabledTracksCheck() {
+      if (this.disabled.length === 0) return
+      this.disabled.forEach((obj, i) => {
+        const minutesPassed = (((Date.now() - obj.timestamp) / 1000) / 60)
+        if (minutesPassed > 60) this.disabledTracksRemove(i, obj.track)
+      })
+    },
+
     /**
      * Adds a given number to positions object (component logic)
      * @param {object} positions Positions to handle
@@ -202,37 +280,8 @@ export default {
   }
 }
 
-.text-wrapper {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 18%;
-  text-align: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-}
-
-.text {
-  color: var(--color-white);
-  font-family: var(--font-semibold);
-  font-size: var(--font-size-m);
-
-  &:nth-child(2) {
-    font-family: var(--font-regular);
-  }
-}
-</style>
-
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 320ms cubic-bezier(.25, .46, .45, .94);
-}
-
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-  transform: translateY(100%);
+.button.is-disabled {
+  transform: rotate(45deg);
+  background-color: var(--color-red);
 }
 </style>

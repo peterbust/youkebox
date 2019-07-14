@@ -1,29 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import axios from 'axios'
+import api from '@/config/api'
 import tracks from '@/state/tracks.json'
 import queue from '@/state/queue.json'
 
-// success
-// recentlyPlayed
-// queueFull
-
-// Add video
-// url: 'http://192.168.1.145/queue',
-// method: 'post',
-// data: { file }
-
 Vue.use(Vuex)
 
-const API = {
-  get: {
-    tracks: '//192.168.1.145/api/library/index.php',
-    queue: '//192.168.1.145/api/queue/index.php',
-  },
-  post: {
-    queue: '//192.168.1.145/api/queue/index.php',
-  },
-}
 let interval
 
 export default new Vuex.Store({
@@ -49,6 +32,15 @@ export default new Vuex.Store({
     set(state, { property, data }) {
       state[property] = data
     },
+
+    /**
+     * Set track disabled property
+     * @param {number} track Track key to update
+     * @param {boolean} value Value to set
+     */
+    trackSetDisabled(state, { track, value }) {
+      Vue.set(state.tracks[track], 'disabled', value)
+    },
   },
 
   actions: {
@@ -57,13 +49,12 @@ export default new Vuex.Store({
      * @param {string} payload.type Type of data to fetch
      */
     dataGet({ commit }, payload) {
-      axios.get(API.get[payload.type])
+      axios.get(api.get[payload.type])
         .then((response) => {
           commit('set', { property: payload.type, data: response.data })
         })
-        .catch((error) => {
+        .catch(() => {
           console.error(`Oops, something went wrong requesting the ${payload.type}.`)
-          console.error(error)
         })
     },
 

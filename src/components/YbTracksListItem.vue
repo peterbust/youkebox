@@ -4,7 +4,11 @@
     :class="[
       $style['wrapper'],
       $style[props.positionClassName],
-      props.positionClassName === 'is-active' && props.select ? $style['is-selected'] : ''
+      props.positionClassName === 'is-active'
+        && props.select
+        && !props.disabled
+        ? $style['is-selected'] : '',
+      props.disabled ? $style['is-disabled'] : ''
     ]"
     :style="{ backgroundImage: `url(${props.thumbnail})` }"
   />
@@ -23,6 +27,18 @@
   .is-active {
     z-index: 1;
     transform: translate(0, -440%) scale(1.5);
+  }
+
+  .is-disabled {
+    &:after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: url('/assets/images/static.gif');
+      background-size: 100%;
+      opacity: .8;
+    }
   }
 
   .is-selected { transform: translate(0, -457%) scale(1.85); }
