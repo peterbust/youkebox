@@ -53,9 +53,17 @@ const makeKeyupEvent = (code, action) => {
   })
 }
 
+/**
+ * Calculate milliseconds to minutes
+ * @param {number} milliseconds Value to calculate to minutes
+ * @returns {number} Calculated minutes
+ */
+const millisecondsToMinutes = milliseconds => ((milliseconds / 1000) / 60)
+
 export {
   addToEachInArray,
   enforceMinimumDigits,
   getKeyByValue,
   makeKeyupEvent,
+  millisecondsToMinutes,
 }

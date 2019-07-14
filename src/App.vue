@@ -27,6 +27,7 @@ export default {
 
   created() {
     if (window.location.host !== 'localhost:8080') this.initDataRequests()
+    setInterval(() => store.dispatch('checkDisabledTracks'), 10000)
   },
 
   methods: {
@@ -36,9 +37,7 @@ export default {
      */
     initDataRequests() {
       store.dispatch('dataGet', { type: 'tracks' })
-      window.setInterval(() => {
-        store.dispatch('dataGet', { type: 'queue' })
-      }, 5000)
+      setInterval(() => store.dispatch('dataGet', { type: 'queue' }), 5000)
     },
   },
 }

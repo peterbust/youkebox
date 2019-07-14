@@ -4,6 +4,7 @@ import axios from 'axios'
 import api from '@/config/api'
 import tracks from '@/state/tracks.json'
 import queue from '@/state/queue.json'
+import { millisecondsToMinutes } from '@/utils'
 
 Vue.use(Vuex)
 
@@ -13,7 +14,7 @@ export default new Vuex.Store({
   state: {
     tracks,
     queue,
-    unavailable: [],
+    disabled: [],
   },
 
   mutations: {
@@ -38,8 +39,11 @@ export default new Vuex.Store({
      * @param {number} track Track key to update
      * @param {boolean} value Value to set
      */
-    trackSetDisabled(state, { track, value }) {
-      Vue.set(state.tracks[track], 'disabled', value)
+    setTrackAvailability(state, { disabledKey, trackKey, value }) {
+      Vue.set(state.tracks[trackKey], 'disabled', value)
+
+      if (value) state.disabled.push({ trackKey, timestamp: Date.now() })
+      else state.disabled.splice(disabledKey, 1)
     },
   },
 
@@ -68,6 +72,22 @@ export default new Vuex.Store({
           commit('addSecondCurrentRemaining')
         } else window.clearTimeout(interval)
       }, 1000)
+    },
+
+    /**
+     * Checks if disabled tracks can be enabled again
+     * If disabled longer ago than one hour
+     */
+    checkDisabledTracks({ commit, state }) {
+      state.disabled.forEach((obj, i) => {
+        if (millisecondsToMinutes((Date.now() - obj.timestamp)) > 0.5) {
+          commit('setTrackAvailability', {
+            disabledKey: i,
+            trackKey: obj.trackKey,
+            value: false,
+          })
+        }
+      })
     },
   },
 

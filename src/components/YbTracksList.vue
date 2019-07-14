@@ -33,7 +33,6 @@
 
 <script>
 import axios from 'axios'
-import store from '@/store'
 import YbTracksListItem from './YbTracksListItem.vue'
 import YbTrackListMessage from './YbTrackListMessage.vue'
 import { addToEachInArray, getKeyByValue, makeKeyupEvent } from '@/utils'
@@ -49,7 +48,6 @@ export default {
 
   data() {
     return {
-      disabled: [],
       select: false,
       positions: {
         active: 0,
@@ -62,6 +60,10 @@ export default {
   computed: {
     tracks() {
       return this.$store.state.tracks
+    },
+
+    disabled() {
+      return this.$store.state.disabled
     },
   },
 
@@ -77,26 +79,18 @@ export default {
     this.positions.previous.forEach((val, i) => {
       this.positions.previous[i] += this.tracks.length
     })
-    this.initKeyEvents()
-    setInterval(() => this.disabledTracksCheck(), 10000)
+
+    makeKeyupEvent('Space', () => this.handleUserSelect())
+    makeKeyupEvent('ArrowLeft', () => this.positionsNavigate(-1))
+    makeKeyupEvent('ArrowRight', () => this.positionsNavigate(1))
   },
 
   methods: {
     /**
-     * Sets up key events
-     * @returns {undefined}
-     */
-    initKeyEvents() {
-      makeKeyupEvent('Space', () => this.handleUserSelection())
-      makeKeyupEvent('ArrowLeft', () => this.positionsNavigate(-1))
-      makeKeyupEvent('ArrowRight', () => this.positionsNavigate(1))
-    },
-
-    /**
      * Handles user selection of a track
      * @returns {undefined}
      */
-    handleUserSelection() {
+    handleUserSelect() {
       if (!this.select) {
         if (!this.tracks[this.positions.active].disabled) this.toggleSelected()
       } else this.trackSubmit(this.tracks[this.positions.active].file)
@@ -110,45 +104,15 @@ export default {
     trackSubmit(file) {
       axios.post(api.post.queue, { file })
         .then(() => {
-          this.disabledTracksAdd(this.positions.active)
-          this.toggleSelected()
+          this.$store.commit('setTrackAvailability', {
+            trackKey: this.positions.active,
+            value: true,
+          })
+          this.toggleSelected(false)
         })
         .catch(() => {
           console.error('Oops, something went wrong submitting a song.')
         })
-    },
-
-    /**
-     * Disables a track by updating the state
-     * @param {number} track Track key to disable
-     * @returns {undefined}
-     */
-    disabledTracksAdd(track) {
-      this.disabled.push({ track, timestamp: Date.now() })
-      store.commit('trackSetDisabled', { track, value: true })
-    },
-
-    /**
-     * Enable a track by updating the state
-     * @param {number} i Disabled key to remove
-     * @param {number} track Track key to disable
-     * @returns {undefined}
-     */
-    disabledTracksRemove(i, track) {
-      this.disabled.splice(i, 1)
-      store.commit('trackSetDisabled', { track, value: false })
-    },
-
-    /**
-     * Check disabled tracks
-     * @returns {undefined}
-     */
-    disabledTracksCheck() {
-      if (this.disabled.length === 0) return
-      this.disabled.forEach((obj, i) => {
-        const minutesPassed = (((Date.now() - obj.timestamp) / 1000) / 60)
-        if (minutesPassed > 60) this.disabledTracksRemove(i, obj.track)
-      })
     },
 
     /**
