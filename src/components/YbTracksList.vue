@@ -223,8 +223,8 @@ export default {
     right: 0;
     bottom: 0;
     left: 0;
-    width: .3rem;
-    height: 1.75rem;
+    width: 6%;
+    height: 35%;
     margin: auto;
     background-color: var(--color-blue);
     transition: all 180ms cubic-bezier(.25, .46, .45, .94);
@@ -233,26 +233,26 @@ export default {
   &:after {
     transform: rotate(90deg);
   }
-}
 
-.button.is-active {
-  transform: scale(1.25);
+  &.is-active {
+    transform: scale(1.25);
 
-  &:before {
-    left: 11px;
+    &:before {
+      left: 11px;
+      transform: rotate(45deg);
+    }
+
+    &:after {
+      top: 11px;
+      right: 14px;
+      height: .875rem;
+      transform: rotate(-45deg);
+    }
+  }
+
+  &.is-disabled {
     transform: rotate(45deg);
+    background-color: var(--color-red);
   }
-
-  &:after {
-    top: 11px;
-    right: 14px;
-    height: .875rem;
-    transform: rotate(-45deg);
-  }
-}
-
-.button.is-disabled {
-  transform: rotate(45deg);
-  background-color: var(--color-red);
 }
 </style>
