@@ -1,6 +1,6 @@
 <template functional>
   <div>
-    <transition name="fade">
+    <TransitionFade>
       <div
         v-show="props.show"
         :class="$style['text-wrapper']"
@@ -13,7 +13,7 @@
           {{ message }}
         </p>
       </div>
-    </transition>
+    </TransitionFade>
   </div>
 </template>
 

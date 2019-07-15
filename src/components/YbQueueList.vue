@@ -14,10 +14,14 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import YbQueueListItem from './YbQueueListItem.vue'
+import YbQueueListItem from '@/components/YbQueueListItem.vue'
+import TransitionFlip from '@/components/TransitionFlip.vue'
 
 export default {
-  components: { YbQueueListItem },
+  components: {
+    YbQueueListItem,
+    TransitionFlip, // eslint-disable-line
+  },
 
   data() {
     return {

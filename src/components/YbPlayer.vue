@@ -1,13 +1,13 @@
 <template>
   <div :class="$style['wrapper']">
-    <transition name="flip">
+    <TransitionFlip>
       <div
         v-show="thumbnailShow"
         class="album-cover"
         :class="$style['album-cover']"
         :style="{ backgroundImage: `url(${thumbnailUrl})` }"
       />
-    </transition>
+    </TransitionFlip>
     <div :class="$style['time-bar']">
       <div
         v-show="thumbnailShow"
@@ -33,8 +33,11 @@
 import store from '@/store'
 import { mapGetters } from 'vuex'
 import { enforceMinimumDigits } from '@/utils'
+import TransitionFlip from '@/components/TransitionFlip.vue'
 
 export default {
+  components: { TransitionFlip },
+
   data() {
     return {
       thumbnailUrl: '',

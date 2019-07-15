@@ -121,25 +121,4 @@ body { background-color: var(--color-black); }
   background-position: center;
   box-shadow: 0 0 .75rem .4rem rgba(0,0,0,.1);
 }
-
-// Global animations
-.flip-enter-active,
-.flip-leave-active {
-  transition: all 280ms cubic-bezier(.25, .46, .45, .94);
-}
-
-.flip-enter,
-.flip-leave-to {
-  transform: rotateY(90deg);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 320ms cubic-bezier(.25, .46, .45, .94);
-}
-
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-  transform: translateY(100%);
-}
 </style>

@@ -1,12 +1,12 @@
 <template functional>
-  <transition name="flip">
+  <TransitionFlip>
     <div
       v-show="props.show"
       class="album-cover"
       :class="$style['wrapper']"
       :style="{ backgroundImage: `url(${props.thumbnail})` }"
     />
-  </transition>
+  </TransitionFlip>
 </template>
 
 <style lang="postcss" module>

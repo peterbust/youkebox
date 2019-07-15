@@ -33,8 +33,9 @@
 
 <script>
 import axios from 'axios'
-import YbTracksListItem from './YbTracksListItem.vue'
+import TransitionFade from './TransitionFade.vue'
 import YbTrackListMessage from './YbTrackListMessage.vue'
+import YbTracksListItem from './YbTracksListItem.vue'
 import { addToEachInArray, getKeyByValue, makeKeyupEvent } from '@/utils'
 import api from '@/config/api'
 
@@ -42,6 +43,7 @@ let timeout
 
 export default {
   components: {
+    TransitionFade, // eslint-disable-line
     YbTracksListItem,
     YbTrackListMessage,
   },
