@@ -27,6 +27,13 @@ export default new Vuex.Store({
     },
 
     /**
+     * Clear disabled tracks
+     */
+    clearDisabledTracks(state) {
+      state.disabled = []
+    },
+
+    /**
      * Overwrite state type
      * @param {string} property State property to overwrite
      * @param {object} data Data to overwrite
@@ -81,7 +88,7 @@ export default new Vuex.Store({
      */
     checkDisabledTracks({ commit, state }) {
       state.disabled.forEach((obj, i) => {
-        if (millisecondsToMinutes((Date.now() - obj.timestamp)) > 0.5) {
+        if (millisecondsToMinutes((Date.now() - obj.timestamp)) > 60) {
           commit('setTrackAvailability', {
             disabledKey: i,
             trackKey: obj.trackKey,

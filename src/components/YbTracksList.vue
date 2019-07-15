@@ -53,23 +53,32 @@ export default {
       select: false,
       positions: {
         active: 0,
-        next: [1, 2, 3, 4],
-        previous: [-1, -2, -3, -4],
+        next: [],
+        previous: [],
       },
     }
   },
 
   computed: {
-    tracks() {
-      return this.$store.state.tracks
-    },
-
     disabled() {
       return this.$store.state.disabled
+    },
+
+    firstTrackTitle() {
+      return this.tracks[0].title
+    },
+
+    tracks() {
+      return this.$store.state.tracks
     },
   },
 
   watch: {
+    firstTrackTitle() {
+      this.$store.commit('clearDisabledTracks')
+      this.positionsInit()
+    },
+
     select() {
       if (this.select) {
         timeout = setTimeout(() => this.toggleSelected(false), 5000)
@@ -78,10 +87,7 @@ export default {
   },
 
   created() {
-    this.positions.previous.forEach((val, i) => {
-      this.positions.previous[i] += this.tracks.length
-    })
-
+    this.positionsInit()
     makeKeyupEvent('Space', () => this.handleUserSelect())
     makeKeyupEvent('ArrowLeft', () => this.positionsNavigate(-1))
     makeKeyupEvent('ArrowRight', () => this.positionsNavigate(1))
@@ -157,6 +163,20 @@ export default {
       }
 
       return null
+    },
+
+    /**
+     * Set default track positions
+     * @returns {undefined}
+     */
+    positionsInit() {
+      this.positions.active = 0
+      this.positions.next = [1, 2, 3, 4]
+      this.positions.previous = [-1, -2, -3, -4]
+
+      this.positions.previous.forEach((val, i) => {
+        this.positions.previous[i] += this.tracks.length
+      })
     },
 
     /**
@@ -238,14 +258,14 @@ export default {
     transform: scale(1.25);
 
     &:before {
-      left: 11px;
+      left: 11%;
       transform: rotate(45deg);
     }
 
     &:after {
-      top: 11px;
-      right: 14px;
-      height: .875rem;
+      top: 11%;
+      right: 19%;
+      height: 16%;
       transform: rotate(-45deg);
     }
   }
