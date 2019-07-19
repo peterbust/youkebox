@@ -8,13 +8,7 @@
         :style="{ backgroundImage: `url(${thumbnailUrl})` }"
       />
     </TransitionFlip>
-    <div :class="$style['time-bar']">
-      <div
-        v-show="thumbnailShow"
-        :class="$style['time-bar-progress']"
-        :style="{ width: `${progressInPercentage}%` }"
-      />
-    </div>
+    <YbPlayerTimeBar />
     <div :class="$style['text-wrapper']">
       <h1 :class="$style['title']">
         {{ track.title }}
@@ -23,20 +17,19 @@
         {{ track.artist }}
       </h2>
     </div>
-    <p :class="$style['time-indicator']">
-      {{ remainingTime }}
-    </p>
   </div>
 </template>
 
 <script>
-import store from '@/store'
 import { mapGetters } from 'vuex'
-import { enforceMinimumDigits } from '@/utils'
 import TransitionFlip from '@/components/TransitionFlip.vue'
+import YbPlayerTimeBar from '@/components/YbPlayerTimeBar.vue'
 
 export default {
-  components: { TransitionFlip },
+  components: {
+    TransitionFlip,
+    YbPlayerTimeBar,
+  },
 
   data() {
     return {
@@ -54,25 +47,14 @@ export default {
       return this.getTrack(this.$store.state.queue.current)
     },
 
-    progressInPercentage() {
-      return this.calcProgressPercentage(this.track.duration, this.track.remaining)
-    },
-
-    remainingTime() {
-      return this.track.remaining < this.track.duration
-        ? this.formatRemainingTime(this.track.duration, this.track.remaining)
-        : '00:00'
-    },
-
-    stateTrackTitle() {
-      return this.track.title
+    queueUpdatedAt() {
+      return this.$store.state.updatedAt.queue
     },
   },
 
   watch: {
-    stateTrackTitle() {
+    queueUpdatedAt() {
       this.onStateChangeAnimateThumbnail()
-      store.dispatch('handleRemainingTime')
     },
   },
 
@@ -81,27 +63,6 @@ export default {
   },
 
   methods: {
-    /**
-     * Calculate track time progress in percentage
-     * @param {number} duration Total duration of track
-     * @param {number} remaining Remaining time left
-     * @returns {number} Progress in percentage
-     */
-    calcProgressPercentage: (duration, remaining) => 100 / duration * remaining,
-
-    /**
-     * Calculates- and formats the remaining time
-     * @param {number} duration Total duration of track in minutes
-     * @param {number} remaining Remaining time left in minutes
-     * @returns {string} Remaining time as formatted string; `-xx:xx`
-     */
-    formatRemainingTime(durationInMinutes, remainingTimeInMinutes) {
-      const totalSeconds = (durationInMinutes - remainingTimeInMinutes) * 60
-      const minutes = enforceMinimumDigits(Math.floor(totalSeconds / 60), 2)
-      const seconds = enforceMinimumDigits(Math.floor(totalSeconds - (minutes * 60)), 2)
-      return totalSeconds > 0 ? `-${minutes}:${seconds}` : '00:00'
-    },
-
     /**
      * Handle state change album cover (for animation)
      * @returns {undefined}
@@ -131,22 +92,6 @@ export default {
   padding-bottom: 30%;
 }
 
-.time-bar {
-  position: absolute;
-  width: 100%;
-  height: 2.5%;
-  bottom: -7%;
-  background-color: var(--color-red);
-  overflow: hidden;
-}
-
-.time-bar-progress {
-  position: absolute;
-  height: 100%;
-  background-color: var(--color-white);
-  transition: all 1000ms linear;
-}
-
 .text-wrapper {
   position: absolute;
   width: 57%;
@@ -166,14 +111,5 @@ export default {
   color: var(--color-white);
   font-family: var(--font-regular);
   font-size: var(--font-size-l);
-}
-
-.time-indicator {
-  position: absolute;
-  right: 0;
-  bottom: -2%;
-  color: var(--color-white);
-  font-family: var(--font-light);
-  font-size: var(--font-size-m);
 }
 </style>

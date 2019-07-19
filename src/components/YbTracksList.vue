@@ -60,21 +60,17 @@ export default {
   },
 
   computed: {
-    disabled() {
-      return this.$store.state.disabled
-    },
-
-    firstTrackTitle() {
-      return this.tracks[0].title
-    },
-
     tracks() {
       return this.$store.state.tracks
+    },
+
+    tracksUpdatedAt() {
+      return this.$store.state.updatedAt.queue
     },
   },
 
   watch: {
-    firstTrackTitle() {
+    tracksUpdatedAt() {
       this.$store.commit('clearDisabledTracks')
       this.positionsInit()
     },

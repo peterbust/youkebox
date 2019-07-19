@@ -8,10 +8,12 @@ import { millisecondsToMinutes } from '@/utils'
 
 Vue.use(Vuex)
 
-let interval
-
 export default new Vuex.Store({
   state: {
+    updatedAt: {
+      tracks: null,
+      queue: null,
+    },
     tracks,
     queue,
     disabled: [],
@@ -19,13 +21,6 @@ export default new Vuex.Store({
   },
 
   mutations: {
-    /**
-     * Adds a second to the current song remaining time
-     */
-    addSecondCurrentRemaining(state) {
-      state.queue.current.remaining += (1 / 60)
-    },
-
     /**
      * Clear disabled tracks
      */
@@ -40,6 +35,7 @@ export default new Vuex.Store({
      */
     set(state, { property, data }) {
       state[property] = data
+      state.updatedAt[property] = Date.now()
     },
 
     /**
@@ -68,18 +64,6 @@ export default new Vuex.Store({
         .catch(() => {
           console.error(`Oops, something went wrong requesting the ${payload.type}.`)
         })
-    },
-
-    /**
-     * Update current song remaining time each second
-     * Break interval when done
-     */
-    handleRemainingTime({ commit, state }) {
-      interval = window.setInterval(() => {
-        if (state.queue.current.remaining < state.queue.current.duration) {
-          commit('addSecondCurrentRemaining')
-        } else window.clearTimeout(interval)
-      }, 1000)
     },
 
     /**
