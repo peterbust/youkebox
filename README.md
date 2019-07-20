@@ -2,7 +2,7 @@
 
 Jukebox like music UI with VueJs. Part of interactive installation running on Raspberry Pi. Optimized for 16:9 aspect ratios.
 
-![alt text](https://github.com/peterbust/youkebox/src/assets/images/github-screenshot.jpg "Screenshot UI Youkebox")
+![alt text](src/assets/images/github-screenshot.jpg?raw=true "Screenshot UI Youkebox")
 
 ## Controls
 | Key | | Action |
