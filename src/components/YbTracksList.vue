@@ -65,7 +65,7 @@ export default {
     },
 
     tracksUpdatedAt() {
-      return store.state.updatedAt.queue
+      return store.state.updatedAt.tracks
     },
 
     allowInteraction() {
