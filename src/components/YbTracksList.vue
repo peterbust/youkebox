@@ -13,19 +13,19 @@
         $style.button,
         select ? $style['is-active'] : '',
         tracks[positions.active].disabled ? $style['is-disabled'] : '',
+        !allowInteraction ? $style['is-hidden'] : '',
       ]"
-      @click="select = !select"
     />
     <YbTrackListMessage
-      :show="!select && !tracks[positions.active].disabled"
+      :show="allowInteraction && !select && !tracks[positions.active].disabled"
       :messages="[tracks[positions.active].title, tracks[positions.active].artist]"
     />
     <YbTrackListMessage
-      :show="select"
+      :show="allowInteraction && select"
       :messages="['Add to queue?']"
     />
     <YbTrackListMessage
-      :show="tracks[positions.active].disabled"
+      :show="allowInteraction && tracks[positions.active].disabled"
       :messages="['Available again later']"
     />
   </div>
@@ -33,13 +33,12 @@
 
 <script>
 import axios from 'axios'
+import store from '@/store'
 import TransitionFade from './TransitionFade.vue'
 import YbTrackListMessage from './YbTrackListMessage.vue'
 import YbTracksListItem from './YbTracksListItem.vue'
-import { addToEachInArray, getKeyByValue, makeKeyupEvent } from '@/utils'
+import { addToEachInArray, getKeyByValue } from '@/utils'
 import api from '@/config/api'
-
-let timeout
 
 export default {
   components: {
@@ -50,78 +49,58 @@ export default {
 
   data() {
     return {
-      select: false,
       positions: {
         active: 0,
         next: [],
         previous: [],
       },
+      select: false,
+      timeout: null,
     }
   },
 
   computed: {
     tracks() {
-      return this.$store.state.tracks
+      return store.state.tracks
     },
 
     tracksUpdatedAt() {
-      return this.$store.state.updatedAt.queue
+      return store.state.updatedAt.queue
+    },
+
+    allowInteraction() {
+      return store.state.allowInteraction
     },
   },
 
   watch: {
     tracksUpdatedAt() {
-      this.$store.commit('clearDisabledTracks')
+      store.commit('clearDisabledTracks')
       this.positionsInit()
     },
 
     select() {
-      if (this.select) {
-        timeout = setTimeout(() => this.toggleSelected(false), 5000)
-      } else window.clearTimeout(timeout)
+      return this.select ? this.selectTimeout() : this.selectTimeoutClear()
     },
   },
 
   created() {
     this.positionsInit()
-    makeKeyupEvent('Space', () => this.handleUserSelect())
-    makeKeyupEvent('ArrowLeft', () => this.positionsNavigate(-1))
-    makeKeyupEvent('ArrowRight', () => this.positionsNavigate(1))
+    this.keyEventsInit()
   },
 
   methods: {
     /**
-     * Handles user selection of a track
+     * Handles key events only if interaction is allowed
      * @returns {undefined}
      */
-    handleUserSelect() {
-      if (!this.select) {
-        if (!this.tracks[this.positions.active].disabled) this.toggleSelected()
-      } else this.trackSubmit(this.tracks[this.positions.active].file)
-    },
-
-    /**
-     * Posts a track to add to the queue
-     * (Works on local environment without submitting to server)
-     * @param {string} file Track property to post
-     * @returns {undefined}
-     */
-    trackSubmit(file) {
-      const submitSuccess = () => {
-        this.$store.commit('setTrackAvailability', {
-          trackKey: this.positions.active,
-          value: true,
-        })
-        this.toggleSelected(false)
-      }
-
-      if (!this.$store.state.localEnv) {
-        axios.post(api.post.queue, { file })
-          .then(() => { submitSuccess() })
-          .catch(() => {
-            console.error('Oops, something went wrong submitting a song.')
-          })
-      } else submitSuccess()
+    keyEventsInit() {
+      document.addEventListener('keyup', (evt) => {
+        if (!this.allowInteraction) return
+        if (evt.code === 'Space') this.selectHandleRequest()
+        if (evt.code === 'ArrowLeft') this.positionsNavigate(-1)
+        if (evt.code === 'ArrowRight') this.positionsNavigate(1)
+      })
     },
 
     /**
@@ -181,16 +160,80 @@ export default {
      * @returns {undefined}
      */
     positionsNavigate(request) {
-      this.toggleSelected(false)
+      this.selectToggle(false)
       this.positions = this.positionsAdd(this.positions, request, this.tracks.length)
+    },
+
+    /**
+     * Handles user selection of a track
+     * @returns {undefined}
+     */
+    selectHandleRequest() {
+      if (!this.select) {
+        if (!this.tracks[this.positions.active].disabled) this.selectToggle()
+      } else this.submit(this.tracks[this.positions.active].file)
+    },
+
+    /**
+     * Set a timeout for selecting a track
+     * @returns {undefined}
+     */
+    selectTimeout() {
+      this.timeout = setTimeout(() => this.selectToggle(false), 5000)
+    },
+
+    /**
+     * Cancel timeout of selecting a track
+     * @returns {undefined}
+     */
+    selectTimeoutClear() {
+      window.clearTimeout(this.timeout)
     },
 
     /**
      * Toggle selected value
      * @returns {undefined}
      */
-    toggleSelected(value = !this.select) {
+    selectToggle(value = !this.select) {
       this.select = value
+    },
+
+    /**
+     * Posts a track to add to the queue
+     * (Works on local environment without submitting to server)
+     * @param {string} file Track property to post
+     * @returns {undefined}
+     */
+    submit(file) {
+      store.commit('toggleAllowInteraction')
+      this.selectTimeoutClear()
+      if (!store.state.localEnv) {
+        axios.post(api.post.queue, { file })
+          .then(() => {
+            this.submitHandleSuccess()
+          })
+          .catch(() => {
+            console.error('Oops, something went wrong submitting a song.')
+            store.commit('toggleAllowInteraction')
+            this.selectTimeout()
+          })
+      } else this.submitHandleSuccess()
+    },
+
+    /**
+     * Handle successfully submitted track in UI
+     * @returns {undefined}
+     */
+    submitHandleSuccess() {
+      this.$root.$emit('LottieConfirmed')
+      setTimeout(() => {
+        store.commit('setTrackAvailability', {
+          trackKey: this.positions.active,
+          value: true,
+        })
+        this.selectToggle(false)
+        store.commit('toggleAllowInteraction')
+      }, 2225)
     },
   },
 }
@@ -264,6 +307,10 @@ export default {
       height: 16%;
       transform: rotate(-45deg);
     }
+  }
+
+  &.is-hidden {
+    transform: scale(0)
   }
 
   &.is-disabled {

@@ -9,6 +9,7 @@
     <YbQueueList />
     <YbPlayer />
     <YbTracksList />
+    <LottieConfirmed />
   </div>
 </template>
 
@@ -17,6 +18,7 @@ import store from '@/store'
 import YbPlayer from '@/components/YbPlayer.vue'
 import YbQueueList from '@/components/YbQueueList.vue'
 import YbTracksList from '@/components/YbTracksList.vue'
+import LottieConfirmed from '@/components/LottieConfirmed.vue'
 import queue2 from '@/state/queue2.json'
 
 export default {
@@ -24,6 +26,7 @@ export default {
     YbPlayer,
     YbQueueList,
     YbTracksList,
+    LottieConfirmed,
   },
 
   created() {

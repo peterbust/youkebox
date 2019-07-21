@@ -10,6 +10,7 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    allowInteraction: true,
     updatedAt: {
       tracks: null,
       queue: null,
@@ -48,6 +49,13 @@ export default new Vuex.Store({
 
       if (value) state.disabled.push({ trackKey, timestamp: Date.now() })
       else state.disabled.splice(disabledKey, 1)
+    },
+
+    /**
+     * Toggle boolean value of 'allowInteraction'
+     */
+    toggleAllowInteraction(state) {
+      state.allowInteraction = !state.allowInteraction
     },
   },
 
