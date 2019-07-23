@@ -36,7 +36,7 @@ export default {
     }),
 
     stateQueue() {
-      return this.$store.state.queue.queue
+      return this.$store.state.data.queue.queue
     },
   },
 

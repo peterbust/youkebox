@@ -13,7 +13,6 @@
 </template>
 
 <script>
-import store from '@/store'
 import { enforceMinimumDigits } from '@/utils'
 
 let interval
@@ -27,11 +26,11 @@ export default {
 
   computed: {
     duration() {
-      return store.state.queue.current.duration
+      return this.$store.state.data.queue.current.duration
     },
 
     remaining() {
-      return store.state.queue.current.remaining + this.seconds
+      return this.$store.state.data.queue.current.remaining + this.seconds
     },
 
     progressInPercentage() {
@@ -44,13 +43,13 @@ export default {
         : '00:00'
     },
 
-    queueUpdatedAt() {
-      return store.state.updatedAt.queue
+    queueOverwrittenAt() {
+      return this.$store.state.data.overwrittenAt.queue
     },
   },
 
   watch: {
-    queueUpdatedAt() {
+    queueOverwrittenAt() {
       this.seconds = 0
       this.intervalClear()
       this.intervalSet()

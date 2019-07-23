@@ -13,19 +13,19 @@
         $style.button,
         select ? $style['is-active'] : '',
         tracks[positions.active].disabled ? $style['is-disabled'] : '',
-        !allowInteraction ? $style['is-hidden'] : '',
+        !allowUserInteraction ? $style['is-hidden'] : '',
       ]"
     />
     <YbTrackListMessage
-      :show="allowInteraction && !select && !tracks[positions.active].disabled"
+      :show="allowUserInteraction && !select && !tracks[positions.active].disabled"
       :messages="[tracks[positions.active].title, tracks[positions.active].artist]"
     />
     <YbTrackListMessage
-      :show="allowInteraction && select"
+      :show="allowUserInteraction && select"
       :messages="['Add to queue?']"
     />
     <YbTrackListMessage
-      :show="allowInteraction && tracks[positions.active].disabled"
+      :show="allowUserInteraction && tracks[positions.active].disabled"
       :messages="['Available again later']"
     />
   </div>
@@ -33,7 +33,6 @@
 
 <script>
 import axios from 'axios'
-import store from '@/store'
 import TransitionFade from './TransitionFade.vue'
 import YbTrackListMessage from './YbTrackListMessage.vue'
 import YbTracksListItem from './YbTracksListItem.vue'
@@ -61,21 +60,21 @@ export default {
 
   computed: {
     tracks() {
-      return store.state.tracks
+      return this.$store.state.data.tracks
     },
 
-    tracksUpdatedAt() {
-      return store.state.updatedAt.tracks
+    tracksOverwrittenAt() {
+      return this.$store.state.data.overwrittenAt.tracks
     },
 
-    allowInteraction() {
-      return store.state.allowInteraction
+    allowUserInteraction() {
+      return this.$store.state.app.interactive
     },
   },
 
   watch: {
-    tracksUpdatedAt() {
-      store.commit('clearDisabledTracks')
+    tracksOverwrittenAt() {
+      this.$store.commit('overwriteData', { property: 'tracksDisabled', data: [] })
       this.positionsInit()
     },
 
@@ -96,7 +95,7 @@ export default {
      */
     keyEventsInit() {
       document.addEventListener('keyup', (evt) => {
-        if (!this.allowInteraction) return
+        if (!this.allowUserInteraction) return
         if (evt.code === 'Space') this.selectHandleRequest()
         if (evt.code === 'ArrowLeft') this.positionsNavigate(-1)
         if (evt.code === 'ArrowRight') this.positionsNavigate(1)
@@ -205,16 +204,16 @@ export default {
      * @returns {undefined}
      */
     submit(file) {
-      store.commit('toggleAllowInteraction')
+      this.$store.commit('toggleInteractiveAllowance')
       this.selectTimeoutClear()
-      if (!store.state.localEnv) {
+      if (!this.$store.state.app.localEnv) {
         axios.post(api.post.queue, { file })
           .then(() => {
             this.submitHandleSuccess()
           })
           .catch(() => {
             console.error('Oops, something went wrong submitting a song.')
-            store.commit('toggleAllowInteraction')
+            this.$store.commit('toggleInteractiveAllowance')
             this.selectTimeout()
           })
       } else this.submitHandleSuccess()
@@ -227,12 +226,12 @@ export default {
     submitHandleSuccess() {
       this.$root.$emit('LottieConfirmed')
       setTimeout(() => {
-        store.commit('setTrackAvailability', {
+        this.$store.commit('setTrackAvailability', {
+          available: true,
           trackKey: this.positions.active,
-          value: true,
         })
         this.selectToggle(false)
-        store.commit('toggleAllowInteraction')
+        this.$store.commit('toggleInteractiveAllowance')
       }, 2225)
     },
   },

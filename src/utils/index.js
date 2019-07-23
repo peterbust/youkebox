@@ -41,19 +41,6 @@ const getKeyByValue = (object, value) => {
 }
 
 /**
- * Sets up an event listener for 'keyup'
- * @param {string || number} code Key code
- * @param {function} action Function to execute on event
- * @returns {event} Event listener 'keyup'
- */
-const makeKeyupEvent = (code, action) => {
-  const type = typeof code === 'string' ? 'code' : 'keyCode'
-  return document.addEventListener('keyup', (evt) => {
-    if (evt[type] === code) action()
-  })
-}
-
-/**
  * Calculate milliseconds to minutes
  * @param {number} milliseconds Value to calculate to minutes
  * @returns {number} Calculated minutes
@@ -64,6 +51,5 @@ export {
   addToEachInArray,
   enforceMinimumDigits,
   getKeyByValue,
-  makeKeyupEvent,
   millisecondsToMinutes,
 }

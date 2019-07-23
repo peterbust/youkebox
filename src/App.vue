@@ -30,12 +30,12 @@ export default {
   },
 
   created() {
-    if (!store.state.localEnv) this.initDataRequests()
+    if (!store.state.app.localEnv) this.initDataRequests()
     setInterval(() => store.dispatch('checkDisabledTracks'), 10000)
 
     // Mock queue commit for local environment
-    if (store.state.localEnv) {
-      setTimeout(() => this.$store.commit('set', { property: 'queue', data: queue2 }), 5000)
+    if (store.state.app.localEnv) {
+      setTimeout(() => this.$store.commit('overwriteData', { property: 'queue', data: queue2 }), 5000)
     }
   },
 
@@ -45,8 +45,8 @@ export default {
      * @returns {undefined}
      */
     initDataRequests() {
-      store.dispatch('dataGet', { type: 'tracks' })
-      setInterval(() => store.dispatch('dataGet', { type: 'queue' }), 5000)
+      store.dispatch('fetchData', { type: 'tracks' })
+      setInterval(() => store.dispatch('fetchData', { type: 'queue' }), 5000)
     },
   },
 }

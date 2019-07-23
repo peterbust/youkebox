@@ -22,6 +22,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
+import store from '@/store'
 import TransitionFlip from '@/components/TransitionFlip.vue'
 import YbPlayerTimeBar from '@/components/YbPlayerTimeBar.vue'
 
@@ -44,16 +45,16 @@ export default {
     }),
 
     track() {
-      return this.getTrack(this.$store.state.queue.current)
+      return this.getTrack(store.state.data.queue.current)
     },
 
-    queueUpdatedAt() {
-      return this.$store.state.updatedAt.queue
+    queueOverwrittenAt() {
+      return store.state.data.overwrittenAt.queue
     },
   },
 
   watch: {
-    queueUpdatedAt() {
+    queueOverwrittenAt() {
       this.onStateChangeAnimateThumbnail()
     },
   },
