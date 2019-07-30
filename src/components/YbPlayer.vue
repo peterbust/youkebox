@@ -49,7 +49,8 @@ export default {
     },
 
     queueOverwrittenAt() {
-      return store.state.data.overwrittenAt.queue
+      // return store.state.data.overwrittenAt.queue
+      return this.$store.state.data.overwrittenAt.queue
     },
   },
 

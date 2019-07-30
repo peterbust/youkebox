@@ -18,7 +18,11 @@ export default new Vuex.Store({
       tracks,
       tracksDisabled: [],
       queue,
-      overwrittenAt: {},
+      overwrittenAt: {
+        queue: null,
+        tracks: null,
+        tracksDisabled: null,
+      },
     },
   },
   getters,
