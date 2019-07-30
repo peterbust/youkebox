@@ -51,7 +51,7 @@ export default {
 .wrapper {
   position: absolute;
   display: block;
-  top: 0;
+  top: 11%;
   left: 0;
   z-index: 1;
   width: 100%;

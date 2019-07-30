@@ -8,7 +8,11 @@
         && props.select
         && !props.disabled
         ? $style['is-selected'] : '',
-      props.disabled ? $style['is-disabled'] : ''
+      props.disabled ? $style['is-disabled'] : '',
+      props.positionClassName === 'is-active'
+        && props.chosen
+        && props.select
+        ? $style['is-chosen'] : ''
     ]"
     :style="{ backgroundImage: `url(${props.thumbnail})` }"
   />
@@ -42,6 +46,14 @@
   }
 
   .is-selected { transform: translate(0, -457%) scale(1.85); }
+
+  .is-chosen { animation: chosen 1000ms; }
+
+  @keyframes chosen {
+    0% { transform: translate(0, -457%) scale(1.85); }
+    30% { transform: translate(0, -440%) scale(1); }
+    100% { transform: translate(0, -457%) scale(1.85); }
+  }
 
   .is-previous-1 { transform: translate(-140%, -420%); }
   .is-previous-2 { transform: translate(-245%, -400%); }

@@ -6,6 +6,7 @@
       :thumbnail="track['thumbnail_url']"
       :position-class-name="positionsGetClassName(i)"
       :select="select"
+      :chosen="chosen"
       :disabled="track.disabled"
     />
     <button
@@ -54,6 +55,7 @@ export default {
         previous: [],
       },
       select: false,
+      chosen: false,
       timeout: null,
     }
   },
@@ -224,6 +226,7 @@ export default {
      * @returns {undefined}
      */
     submitHandleSuccess() {
+      this.chosen = true
       this.$root.$emit('LottieConfirmed')
       setTimeout(() => {
         this.$store.commit('setTrackAvailability', {
@@ -231,8 +234,9 @@ export default {
           trackKey: this.positions.active,
         })
         this.selectToggle(false)
+        this.chosen = false
         this.$store.commit('toggleInteractiveAllowance')
-      }, 2225)
+      }, 2250)
     },
   },
 }
