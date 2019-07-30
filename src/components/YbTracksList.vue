@@ -229,13 +229,15 @@ export default {
       this.chosen = true
       this.$root.$emit('LottieConfirmed')
       setTimeout(() => {
-        this.$store.commit('setTrackAvailability', {
-          available: true,
-          trackKey: this.positions.active,
-        })
+        setTimeout(() => {
+          this.$store.commit('setTrackAvailability', {
+            available: true,
+            trackKey: this.positions.active,
+          })
+          this.$store.commit('toggleInteractiveAllowance')
+        }, 220)
         this.selectToggle(false)
         this.chosen = false
-        this.$store.commit('toggleInteractiveAllowance')
       }, 2250)
     },
   },
@@ -256,7 +258,6 @@ export default {
     width: 100%;
     height: 85%;
     opacity: .6;
-    background-image: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, var(--color-red) 100%);
   }
 }
 
