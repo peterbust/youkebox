@@ -1,12 +1,12 @@
 <template>
   <div>
-    <div :class="$style['bar']">
+    <div class="bar">
       <div
-        :class="$style['bar-progress']"
+        class="bar-progress"
         :style="{ width: `${progressInPercentage}%` }"
       />
     </div>
-    <p :class="$style['time']">
+    <p class="time">
       {{ remainingTime }}
     </p>
   </div>
@@ -29,17 +29,17 @@ export default {
       return this.$store.state.data.queue.current.duration
     },
 
-    remaining() {
-      return this.$store.state.data.queue.current.remaining + this.seconds
+    progressInPercentage() {
+      return 100 / this.duration * (this.duration - this.remaining)
     },
 
-    progressInPercentage() {
-      return 100 / this.duration * this.remaining
+    remaining() {
+      return this.$store.state.data.queue.current.remaining - this.seconds
     },
 
     remainingTime() {
-      return this.remaining < this.duration
-        ? this.formatRemainingTime(this.duration, this.remaining)
+      return this.remaining > 0
+        ? this.formatRemainingTime(this.remaining)
         : '00:00'
     },
 
@@ -58,8 +58,7 @@ export default {
 
   methods: {
     /**
-     * Bread interval
-     * @returns {undefined}
+     * Clear interval
      */
     intervalClear() {
       window.clearTimeout(interval)
@@ -68,32 +67,29 @@ export default {
     /**
      * Add a second each second to seconds for computing remaining time
      * Break interval when done
-     * @returns {undefined}
      */
     intervalSet() {
       interval = window.setInterval(() => {
-        if (this.remaining < this.duration) this.seconds += (1 / 60)
+        if (this.remaining > 0) this.seconds += (1 / 60)
         else this.intervalClear()
       }, 1000)
     },
 
     /**
      * Calculates- and formats the remaining time
-     * @param {number} duration Total duration of track in minutes
      * @param {number} remaining Remaining time left in minutes
      * @returns {string} Remaining time as formatted string; `-xx:xx`
      */
-    formatRemainingTime(durationInMinutes, remainingTimeInMinutes) {
-      const totalSeconds = (durationInMinutes - remainingTimeInMinutes) * 60
-      const minutes = enforceMinimumDigits(Math.floor(totalSeconds / 60), 2)
-      const seconds = enforceMinimumDigits(Math.floor(totalSeconds - (minutes * 60)), 2)
-      return totalSeconds > 0 ? `-${minutes}:${seconds}` : '00:00'
+    formatRemainingTime(remaining) {
+      const minutes = enforceMinimumDigits(Math.floor(remaining), 2)
+      const seconds = enforceMinimumDigits(Math.floor((remaining * 60) - (minutes * 60)), 2)
+      return remaining > 0 ? `-${minutes}:${seconds}` : '00:00'
     },
   },
 }
 </script>
 
-<style lang="postcss" module>
+<style lang="postcss" scoped>
 .bar {
   position: absolute;
   width: 100%;

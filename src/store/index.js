@@ -4,7 +4,6 @@ import getters from '@/store/getters'
 import actions from '@/store/actions'
 import mutations from '@/store/mutations'
 import tracks from '@/state/tracks.json'
-import queue from '@/state/queue.json'
 
 Vue.use(Vuex)
 
@@ -16,8 +15,11 @@ export default new Vuex.Store({
     },
     data: {
       tracks,
-      tracksDisabled: [],
-      queue,
+      tracksDisabled: {},
+      queue: {
+        current: {},
+        queue: [],
+      },
       overwrittenAt: {
         queue: null,
         tracks: null,

@@ -1,19 +1,20 @@
 <template>
-  <div :class="$style['wrapper']">
-    <h2 :class="$style['title']">
+  <div class="wrapper">
+    <h2 class="title">
       Queue
     </h2>
     <YbQueueListItem
-      v-for="(track, i) in tracks"
+      v-for="(track, i) in queuedTracks"
       :key="i"
       :thumbnail="getTrack(track)['thumbnail_url']"
-      :show="tracksShow[i]"
+      :show="showQueuedTracks[i]"
     />
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
+import store from '@/store'
 import YbQueueListItem from '@/components/YbQueueListItem.vue'
 import TransitionFlip from '@/components/TransitionFlip.vue'
 
@@ -25,8 +26,8 @@ export default {
 
   data() {
     return {
-      tracks: [],
-      tracksShow: new Array(3).fill(true),
+      queuedTracks: [{}, {}, {}],
+      showQueuedTracks: new Array(3).fill(true),
     }
   },
 
@@ -35,45 +36,42 @@ export default {
       getTrack: 'getTrackByReference',
     }),
 
-    stateQueue() {
-      return this.$store.state.data.queue.queue
+    queueOverwrittenAt() {
+      return store.state.data.overwrittenAt.queue
     },
   },
 
   watch: {
-    stateQueue(newObject, oldObject) {
-      this.onStateChangeAnimateUi(newObject, oldObject)
+    queueOverwrittenAt() {
+      this.handleQueueChange()
     },
-  },
-
-  created() {
-    this.tracks = this.stateQueue
   },
 
   methods: {
     /**
-     * Handle state changes in queue (for animation)
-     * @param {object} newObject New state queue object
-     * @param {object} oldObject Old state queue object
-     * @returns {undefined}
+     * Animate changed track covers
      */
-    onStateChangeAnimateUi(newObject, oldObject) {
+    handleQueueChange() {
+      const queuedTracks = store.state.data.queue.queue
+
       for (let i = 0; i < 3; i += 1) {
-        if (newObject[i].title !== oldObject[i].title) {
-          this.$set(this.tracksShow, i, false)
+        if (!queuedTracks[i]) queuedTracks[i] = {}
+
+        if (this.queuedTracks[i].title !== queuedTracks[i].title) {
+          this.$set(this.showQueuedTracks, i, false)
         }
       }
 
       setTimeout(() => {
-        this.tracks = this.stateQueue
-        this.tracksShow = this.tracksShow.map(() => true)
+        this.queuedTracks = queuedTracks
+        this.showQueuedTracks = this.showQueuedTracks.map(() => true)
       }, 280)
     },
   },
 }
 </script>
 
-<style lang="postcss" module>
+<style lang="postcss" scoped>
 .wrapper {
   position: absolute;
   top: 13.75%;

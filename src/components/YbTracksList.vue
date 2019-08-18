@@ -1,32 +1,31 @@
 <template>
-  <div :class="$style.wrapper">
+  <div class="wrapper">
     <YbTracksListItem
       v-for="(track, i) in tracks"
       :key="i"
-      :thumbnail="track['thumbnail_url']"
+      :animating="animating"
+      :full-queue="fullQueue"
       :position-class-name="positionsGetClassName(i)"
-      :select="select"
-      :chosen="chosen"
-      :disabled="track.disabled"
+      :track="track"
     />
     <button
-      :class="[
-        $style.button,
-        select ? $style['is-active'] : '',
-        tracks[positions.active].disabled ? $style['is-disabled'] : '',
-        !allowUserInteraction ? $style['is-hidden'] : '',
-      ]"
+      class="button"
+      :class="buttonModifierClass"
     />
     <YbTrackListMessage
-      :show="allowUserInteraction && !select && !tracks[positions.active].disabled"
-      :messages="[tracks[positions.active].title, tracks[positions.active].artist]"
+      :show="!activeTrack.isSelected && !activeTrack.isDisabled"
+      :messages="[activeTrack.title, activeTrack.artist]"
     />
     <YbTrackListMessage
-      :show="allowUserInteraction && select"
+      :show="fullQueue && activeTrack.isSelected && !activeTrack.isDisabled"
+      :messages="['Queue is full, wait a bit']"
+    />
+    <YbTrackListMessage
+      :show="!fullQueue && !animating && activeTrack.isSelected"
       :messages="['Add to queue?']"
     />
     <YbTrackListMessage
-      :show="allowUserInteraction && tracks[positions.active].disabled"
+      :show="activeTrack.isDisabled"
       :messages="['Available again later']"
     />
   </div>
@@ -34,11 +33,14 @@
 
 <script>
 import axios from 'axios'
-import TransitionFade from './TransitionFade.vue'
-import YbTrackListMessage from './YbTrackListMessage.vue'
-import YbTracksListItem from './YbTracksListItem.vue'
 import { addToEachInArray, getKeyByValue } from '@/utils'
 import api from '@/config/api'
+import store from '@/store'
+import TransitionFade from '@/components/TransitionFade.vue'
+import YbTrackListMessage from '@/components/YbTrackListMessage.vue'
+import YbTracksListItem from '@/components/YbTracksListItem.vue'
+
+let selectTimeout = null
 
 export default {
   components: {
@@ -49,39 +51,34 @@ export default {
 
   data() {
     return {
+      animating: false,
       positions: {
         active: 0,
         next: [],
         previous: [],
       },
-      select: false,
-      chosen: false,
-      timeout: null,
     }
   },
 
   computed: {
-    tracks() {
-      return this.$store.state.data.tracks
+    allowUserInteraction() { return store.state.app.interactive },
+    buttonModifierClass() {
+      if (this.animating) return 'is-hidden'
+      if (this.activeTrack.isDisabled) return 'is-disabled'
+      if (this.activeTrack.isSelected && this.fullQueue) return 'is-full-queue'
+      if (this.activeTrack.isSelected && !this.fullQueue) return 'is-selected'
+      return ''
     },
-
-    tracksOverwrittenAt() {
-      return this.$store.state.data.overwrittenAt.tracks
-    },
-
-    allowUserInteraction() {
-      return this.$store.state.app.interactive
-    },
+    fullQueue() { return store.getters.fullQueue },
+    activeTrack() { return this.tracks[this.positions.active] },
+    tracks() { return store.state.data.tracks },
+    tracksOverwrittenAt() { return store.state.data.overwrittenAt.tracks },
   },
 
   watch: {
     tracksOverwrittenAt() {
       this.$store.commit('overwriteData', { property: 'tracksDisabled', data: [] })
       this.positionsInit()
-    },
-
-    select() {
-      return this.select ? this.selectTimeout() : this.selectTimeoutClear()
     },
   },
 
@@ -93,12 +90,17 @@ export default {
   methods: {
     /**
      * Handles key events only if interaction is allowed
-     * @returns {undefined}
      */
     keyEventsInit() {
       document.addEventListener('keyup', (evt) => {
         if (!this.allowUserInteraction) return
-        if (evt.code === 'Space') this.selectHandleRequest()
+        if (evt.code === 'Space' && !this.activeTrack.isDisabled) {
+          if (this.activeTrack.isSelected && !this.fullQueue) {
+            this.trackSubmit(this.tracks[this.positions.active].file)
+          } else {
+            this.trackSelect(!this.activeTrack.isSelected)
+          }
+        }
         if (evt.code === 'ArrowLeft') this.positionsNavigate(-1)
         if (evt.code === 'ArrowRight') this.positionsNavigate(1)
       })
@@ -143,7 +145,6 @@ export default {
 
     /**
      * Set default track positions
-     * @returns {undefined}
      */
     positionsInit() {
       this.positions.active = 0
@@ -158,93 +159,96 @@ export default {
     /**
      * Navigate number of tracks
      * @param {number} request Number to handle in positions
-     * @returns {undefined}
      */
     positionsNavigate(request) {
-      this.selectToggle(false)
+      this.trackSelect(false)
       this.positions = this.positionsAdd(this.positions, request, this.tracks.length)
     },
 
     /**
-     * Handles user selection of a track
-     * @returns {undefined}
+     * Disable a track
      */
-    selectHandleRequest() {
-      if (!this.select) {
-        if (!this.tracks[this.positions.active].disabled) this.selectToggle()
-      } else this.submit(this.tracks[this.positions.active].file)
+    trackDisable() {
+      store.commit('setTrackStatus', {
+        key: this.positions.active,
+        status: 'isDisabled',
+      })
+      store.commit('disabledTrackRegister', { key: this.positions.active })
     },
 
     /**
-     * Set a timeout for selecting a track
-     * @returns {undefined}
+     * Select a track (if not already selected)
+     * Handle selection timeout
+     * @param {boolean} value Select value (default true)
      */
-    selectTimeout() {
-      this.timeout = setTimeout(() => this.selectToggle(false), 5000)
+    trackSelect(value = true) {
+      if (this.activeTrack.isSelected !== value) {
+        store.commit('setTrackStatus', {
+          key: this.positions.active,
+          status: 'isSelected',
+          value,
+        })
+      }
+
+      if (value) selectTimeout = setTimeout(() => this.trackSelect(false), 5000)
+      else window.clearTimeout(selectTimeout)
     },
 
     /**
-     * Cancel timeout of selecting a track
-     * @returns {undefined}
-     */
-    selectTimeoutClear() {
-      window.clearTimeout(this.timeout)
-    },
-
-    /**
-     * Toggle selected value
-     * @returns {undefined}
-     */
-    selectToggle(value = !this.select) {
-      this.select = value
-    },
-
-    /**
-     * Posts a track to add to the queue
-     * (Works on local environment without submitting to server)
+     * Posts track to add to queue
+     * (Else handles mock response for local development)
      * @param {string} file Track property to post
-     * @returns {undefined}
      */
-    submit(file) {
-      this.$store.commit('toggleInteractiveAllowance')
-      this.selectTimeoutClear()
-      if (!this.$store.state.app.localEnv) {
-        axios.post(api.post.queue, { file })
-          .then(() => {
-            this.submitHandleSuccess()
+    trackSubmit(file) {
+      store.commit('toggleInteractiveAllowance')
+      window.clearTimeout(selectTimeout)
+
+      if (!store.state.app.localEnv) {
+        axios.get(api.get.postToQueue, { params: { file } })
+          .then((data) => {
+            this.trackSubmitHandleResponse(data.data.response)
           })
           .catch(() => {
             console.error('Oops, something went wrong submitting a song.')
-            this.$store.commit('toggleInteractiveAllowance')
-            this.selectTimeout()
+            this.trackSubmitHandleResponse('error')
           })
-      } else this.submitHandleSuccess()
+      } else {
+        this.trackSubmitHandleResponse('success')
+      }
     },
 
     /**
-     * Handle successfully submitted track in UI
-     * @returns {undefined}
+     * Handle possible submit responses
+     * @param {string} response Response value from server
      */
-    submitHandleSuccess() {
-      this.chosen = true
-      this.$root.$emit('LottieConfirmed')
-      setTimeout(() => {
+    trackSubmitHandleResponse(response) {
+      if (response === 'success') {
+        this.animating = true
+        this.$root.$emit('LottieConfirmed')
         setTimeout(() => {
-          this.$store.commit('setTrackAvailability', {
-            available: true,
-            trackKey: this.positions.active,
-          })
-          this.$store.commit('toggleInteractiveAllowance')
-        }, 220)
-        this.selectToggle(false)
-        this.chosen = false
-      }, 2250)
+          this.trackSelect(false)
+          this.trackDisable()
+          store.commit('toggleInteractiveAllowance')
+          this.animating = false
+        }, 2000)
+      }
+
+      if (response === 'recentlyPlayed') {
+        this.trackSelect(false)
+        this.trackDisable()
+        store.commit('toggleInteractiveAllowance')
+      }
+
+      if (response === 'queueFull' || response === 'error') {
+        this.trackSelect(false)
+        store.commit('toggleInteractiveAllowance')
+      }
     },
   },
 }
 </script>
 
-<style lang="postcss" module>
+<style lang="postcss" scoped>
 .wrapper {
   position: absolute;
   bottom: 0;
@@ -297,7 +301,7 @@ export default {
     transform: rotate(90deg);
   }
 
-  &.is-active {
+  &.is-selected {
     transform: scale(1.25);
 
     &:before {
@@ -314,12 +318,17 @@ export default {
   }
 
   &.is-hidden {
-    transform: scale(0)
+    transform: scale(0) rotate(0deg);
   }
 
   &.is-disabled {
-    transform: rotate(45deg);
+    transform: scale(1) rotate(45deg);
     background-color: var(--color-red);
+  }
+
+  &.is-full-queue {
+    transform: scale(1.25) rotate(45deg);
+    background-color: orange;
   }
 }
 </style>

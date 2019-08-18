@@ -1,7 +1,7 @@
 <template>
   <div
     ref="lottie"
-    :class="$style['wrapper']"
+    class="wrapper"
   />
 </template>
 
@@ -24,7 +24,6 @@ export default {
   methods: {
     /**
      * Setup Lottie animation
-     * @returns {undefined}
      */
     init() {
       this.animation = lottie.loadAnimation({
@@ -38,7 +37,6 @@ export default {
 
     /**
      * Play animation
-     * @returns {undefined}
      */
     play() {
       this.animation.goToAndPlay(0)
@@ -47,7 +45,7 @@ export default {
 }
 </script>
 
-<style lang="postcss" module>
+<style lang="postcss" scoped>
 .wrapper {
   position: absolute;
   display: block;

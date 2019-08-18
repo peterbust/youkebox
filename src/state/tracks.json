@@ -2,56 +2,67 @@
   {
     "thumbnail_url": "https://images-na.ssl-images-amazon.com/images/I/81fvyZlrbAL._SY355_.jpg",
     "artist": "Pink Floyd",
-    "title": "High Hopes"
+    "title": "High Hopes",
+    "file": "file0"
   },
   {
     "thumbnail_url": "https://vmp-www.imgix.net/images/710dLL1X5TL._SL1220_.original.jpg?auto=format&w=1700&h=1660",
     "artist": "Nina Simone",
-    "title": "Sinnerman"
+    "title": "Sinnerman",
+    "file": "file1"
   },
   {
     "thumbnail_url": "https://d2s36jztkuk7aw.cloudfront.net/sites/default/files/tile/image/A-116-01comp.jpg",
     "artist": "The Beatles",
-    "title": "Come Together"
+    "title": "Come Together",
+    "file": "file2"
   },
   {
     "thumbnail_url": "https://dumielauxepices.net/sites/default/files/drawn-album-cover-1968-album-512477-9491839.jpg",
     "artist": "Fleetwood Mac",
-    "title": "The Chain"
+    "title": "The Chain",
+    "file": "file3"
   },
   {
     "thumbnail_url": "https://www.xlr8r.com/.image/t_share/MTU1MzE5MjI4NzQ1MzI3ODA0/jh_singularity_4096.jpg",
     "artist": "Jon Hopkins",
-    "title": "Esmerald Rush"
+    "title": "Esmerald Rush",
+    "file": "file4"
   },
   {
     "thumbnail_url": "https://www.music-bazaar.com/album-images/vol3/390/390698/2224314-big/Glass-Box-A-Nonesuch-Retrospective-Disc-4-Glassworks-Analog-cover.jpg",
     "artist": "Philip Glass",
-    "title": "Metamorphosis"
+    "title": "Metamorphosis",
+    "file": "file5"
   },
   {
     "thumbnail_url": "https://s.s-bol.com/imgbase0/imagebase3/large/FC/2/0/5/0/1000004000000502.jpg",
     "artist": "Tom Waits",
-    "title": "I Hope That I Don't Fall In Love With You"
+    "title": "I Hope That I Don't Fall In Love With You",
+    "file": "file6"
   },
   {
     "thumbnail_url": "https://is5-ssl.mzstatic.com/image/thumb/Music1/v4/8d/24/57/8d2457e3-882c-99e5-9ef4-fd29ce3bfc6b/source/1200x1200bb.jpg",
     "artist": "Leonard Cohen",
-    "title": "Hallelujah"
+    "title": "Hallelujah",
+    "file": "file7"
   },
   {
     "thumbnail_url": "http://classicalbumsundays.com/wp-content/uploads/2017/10/GIL-scott-heron-pieces-of-a-man-album-cover.jpeg",
     "artist": "Gill Scott Heron",
-    "title": "The Revolution Will Not Be Televised"
+    "title": "The Revolution Will Not Be Televised",
+    "file": "file8"
   },
   {
     "thumbnail_url": "https://cdn2.dustygroove.com/images/products/b/brown_james_imreal~~~_101b.jpg",
     "artist": "James Brown",
-    "title": "The Boss"
+    "title": "The Boss",
+    "file": "file9"
   },
   {
     "thumbnail_url": "https://classicrockmag.nl/wp-content/uploads/2014/09/bob_dylan_oh_mercy-ll1820-1286820934.jpeg",
     "artist": "Bob Dylan",
-    "title": "Man In The Long Black Coat"
+    "title": "Man In The Long Black Coat",
+    "file": "file10"
   }
 ]

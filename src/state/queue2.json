@@ -1,16 +1,12 @@
 {
   "current": {
-    "duration": 2.1,
-    "remaining": 0,
+    "duration": 4,
+    "remaining": 4,
     "title": "The Revolution Will Not Be Televised"
   },
   "queue": [
     {
       "title": "Come Together"
-    }, 
-    {
-    },
-    {
     }
   ]
 }

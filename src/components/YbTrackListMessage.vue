@@ -3,12 +3,12 @@
     <TransitionFade>
       <div
         v-show="props.show"
-        :class="$style['text-wrapper']"
+        class="text-wrapper"
       >
         <p
           v-for="(message, i) in props.messages"
           :key="i"
-          :class="$style.text"
+          class="text"
         >
           {{ message }}
         </p>
@@ -17,7 +17,7 @@
   </div>
 </template>
 
-<style lang="postcss" module>
+<style lang="postcss" scoped>
 .text-wrapper {
   position: absolute;
   bottom: 0;

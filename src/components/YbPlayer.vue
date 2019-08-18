@@ -1,19 +1,18 @@
 <template>
-  <div :class="$style['wrapper']">
+  <div class="wrapper">
     <TransitionFlip>
       <div
         v-show="thumbnailShow"
         class="album-cover"
-        :class="$style['album-cover']"
-        :style="{ backgroundImage: `url(${thumbnailUrl})` }"
+        :style="{ backgroundImage: `url(${thumbnail})` }"
       />
     </TransitionFlip>
     <YbPlayerTimeBar />
-    <div :class="$style['text-wrapper']">
-      <h1 :class="$style['title']">
+    <div class="text-wrapper">
+      <h1 class="title">
         {{ track.title }}
       </h1>
-      <h2 :class="$style['artist']">
+      <h2 class="artist">
         {{ track.artist }}
       </h2>
     </div>
@@ -34,7 +33,7 @@ export default {
 
   data() {
     return {
-      thumbnailUrl: '',
+      thumbnail: '',
       thumbnailShow: true,
     }
   },
@@ -49,8 +48,7 @@ export default {
     },
 
     queueOverwrittenAt() {
-      // return store.state.data.overwrittenAt.queue
-      return this.$store.state.data.overwrittenAt.queue
+      return store.state.data.overwrittenAt.queue
     },
   },
 
@@ -60,28 +58,24 @@ export default {
     },
   },
 
-  created() {
-    this.thumbnailUrl = this.track.thumbnail_url
-  },
-
   methods: {
     /**
      * Handle state change album cover (for animation)
-     * @returns {undefined}
      */
     onStateChangeAnimateThumbnail() {
-      this.thumbnailShow = false
-
-      setTimeout(() => {
-        this.thumbnailUrl = this.track.thumbnail_url
-        this.thumbnailShow = true
-      }, 280)
+      if (this.track.thumbnail_url !== this.thumbnail) {
+        this.thumbnailShow = false
+        setTimeout(() => {
+          this.thumbnail = this.track.thumbnail_url
+          this.thumbnailShow = true
+        }, 280)
+      }
     },
   },
 }
 </script>
 
-<style lang="postcss" module>
+<style lang="postcss" scoped>
 .wrapper {
   position: absolute;
   top: 8.5%;

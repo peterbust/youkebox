@@ -1,8 +1,10 @@
 <template>
   <div id="app">
     <video
+      ref="video"
       width="100%"
       autoplay
+      muted
       loop
       src="/assets/movies/bg.mp4"
     />
@@ -19,6 +21,7 @@ import YbPlayer from '@/components/YbPlayer.vue'
 import YbQueueList from '@/components/YbQueueList.vue'
 import YbTracksList from '@/components/YbTracksList.vue'
 import LottieConfirmed from '@/components/LottieConfirmed.vue'
+import queue from '@/state/queue.json'
 import queue2 from '@/state/queue2.json'
 
 export default {
@@ -29,24 +32,33 @@ export default {
     LottieConfirmed,
   },
 
-  created() {
-    if (!store.state.app.localEnv) this.initDataRequests()
+  mounted() {
+    document.body.style.cursor = 'none'
+
+    this.$refs.video.play()
+
+    if (!store.state.app.localEnv) {
+      store.dispatch('fetchData', { type: 'tracks' })
+      this.fetchQueue()
+    }
+
     setInterval(() => store.dispatch('checkDisabledTracks'), 10000)
 
     // Mock queue commit for local environment
     if (store.state.app.localEnv) {
+      this.$store.commit('overwriteData', { property: 'queue', data: queue })
       setTimeout(() => this.$store.commit('overwriteData', { property: 'queue', data: queue2 }), 5000)
     }
   },
 
   methods: {
     /**
-     * Fetch tracks and repeatedly fetch queue
+     * Repeatedly fetch queue
      * @returns {undefined}
      */
-    initDataRequests() {
-      store.dispatch('fetchData', { type: 'tracks' })
-      setInterval(() => store.dispatch('fetchData', { type: 'queue' }), 5000)
+    fetchQueue() {
+      store.dispatch('fetchData', { type: 'queue' })
+      setTimeout(() => this.fetchQueue(), 5000)
     },
   },
 }

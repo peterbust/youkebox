@@ -1,24 +1,17 @@
 <template functional>
   <div
-    class="album-cover"
+    class="wrapper album-cover"
     :class="[
-      $style['wrapper'],
-      $style[props.positionClassName],
-      props.positionClassName === 'is-active'
-        && props.select
-        && !props.disabled
-        ? $style['is-selected'] : '',
-      props.disabled ? $style['is-disabled'] : '',
-      props.positionClassName === 'is-active'
-        && props.chosen
-        && props.select
-        ? $style['is-chosen'] : ''
+      props.positionClassName,
+      props.track.isSelected ? 'is-selected' : '',
+      props.track.isDisabled ? 'is-disabled' : '',
+      props.animating && props.track.isSelected ? 'is-animating' : '',
     ]"
-    :style="{ backgroundImage: `url(${props.thumbnail})` }"
+    :style="{ backgroundImage: `url(${props.track.thumbnail_url})` }"
   />
 </template>
 
-<style lang="postcss" module>
+<style lang="postcss" scoped>
   .wrapper {
     position: absolute;
     bottom: -175%;
@@ -47,9 +40,9 @@
 
   .is-selected { transform: translate(0, -457%) scale(1.85); }
 
-  .is-chosen { animation: chosen 1000ms; }
+  .is-animating { animation: submit 1000ms; }
 
-  @keyframes chosen {
+  @keyframes submit {
     0% { transform: translate(0, -457%) scale(1.85); }
     30% { transform: translate(0, -440%) scale(1); }
     100% { transform: translate(0, -457%) scale(1.85); }
