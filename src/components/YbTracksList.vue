@@ -230,6 +230,7 @@ export default {
           this.trackDisable()
           store.commit('toggleInteractiveAllowance')
           this.animating = false
+          store.dispatch('fetchData', { type: 'queue' })
         }, 2000)
       }
 
