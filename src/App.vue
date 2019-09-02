@@ -1,13 +1,6 @@
 <template>
   <div id="app">
-    <video
-      ref="video"
-      width="100%"
-      autoplay
-      muted
-      loop
-      src="/assets/movies/bg.mp4"
-    />
+    <div class="background-image" />
     <YbQueueList />
     <YbPlayer />
     <YbTracksList />
@@ -34,8 +27,6 @@ export default {
 
   mounted() {
     document.body.style.cursor = 'none'
-
-    this.$refs.video.play()
 
     if (!store.state.app.localEnv) {
       store.dispatch('fetchData', { type: 'tracks' })
@@ -135,5 +126,13 @@ body { background-color: var(--color-black); }
   background-size: cover;
   background-position: center;
   box-shadow: 0 0 .75rem .4rem rgba(0,0,0,.1);
+}
+
+.background-image {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url('./assets/images/background.jpeg');
+  background-size: cover;
 }
 </style>
