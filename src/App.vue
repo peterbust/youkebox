@@ -132,7 +132,7 @@ body { background-color: var(--color-black); }
   position: absolute;
   width: 100%;
   height: 100%;
-  background-image: url('/assets/images/background.gif');
+  background-image: url('./assets/images/background.jpg');
   background-size: cover;
 }
 </style>
