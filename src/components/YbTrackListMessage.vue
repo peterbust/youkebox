@@ -1,12 +1,12 @@
-<template functional>
+<template>
   <div>
     <TransitionFade>
       <div
-        v-show="props.show"
+        v-show="show"
         class="text-wrapper"
       >
         <p
-          v-for="(message, i) in props.messages"
+          v-for="(message, i) in messages"
           :key="i"
           class="text"
         >
@@ -16,6 +16,28 @@
     </TransitionFade>
   </div>
 </template>
+
+<script>
+import TransitionFade from '@/components/TransitionFade.vue'
+
+export default {
+  components: {
+    TransitionFade,
+  },
+
+  props: {
+    show: {
+      type: Boolean,
+      default: false,
+    },
+
+    messages: {
+      type: Array,
+      default: () => [],
+    },
+  },
+}
+</script>
 
 <style lang="postcss" scoped>
 .text-wrapper {

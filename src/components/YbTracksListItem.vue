@@ -44,7 +44,7 @@
 
   @keyframes submit {
     0% { transform: translate(0, -457%) scale(1.85); }
-    30% { transform: translate(0, -440%) scale(1); }
+    30% { transform: translate(0, -455%) scale(1); }
     100% { transform: translate(0, -457%) scale(1.85); }
   }
 

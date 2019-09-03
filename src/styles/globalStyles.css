@@ -1,0 +1,15 @@
+::selection {
+  color: var(--color-blue);
+  background: var(--color-red);
+}
+
+body {
+  background-color: var(--color-black);
+}
+
+.album-cover {
+  background-color: #213150;
+  background-size: cover;
+  background-position: center;
+  box-shadow: 0 0 .75rem .4rem rgba(0,0,0,.1);
+}

@@ -19,4 +19,14 @@ export default {
     ...trackReference,
     ...state.data.tracks.find(track => track.title === trackReference.title),
   }),
+
+  /**
+   * Finds a track by title and returns track key
+   */
+  getTrackKeyByTitle: state => (title) => {
+    for (let i = 0; i < state.data.tracks.length; i += 1) {
+      if (state.data.tracks[i].title === title) return i
+    }
+    return null
+  },
 }

@@ -2,6 +2,11 @@ import Vue from 'vue'
 import App from '@/App.vue'
 import store from '@/store'
 
+import '@/styles/miniReset.css'
+import '@/styles/customProperties.css'
+import '@/styles/fonts.css'
+import '@/styles/globalStyles.css'
+
 Vue.config.productionTip = false
 
 new Vue({

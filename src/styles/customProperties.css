@@ -1,0 +1,13 @@
+:root {
+  --color-black: #000;
+  --color-white: #faf2ef;
+  --color-blue: #182645;
+  --color-green: #3BD487;
+  --color-red: #ed6a54;
+  --font-light: 'Graphik Light', Helvetica, Arial, sans-serif;
+  --font-regular: 'Graphik Regular', Helvetica, Arial, sans-serif;
+  --font-semibold: 'Graphik Semibold', Helvetica, Arial, sans-serif;
+  --font-size-xl: 2.5vw;
+  --font-size-l: 2vw;
+  --font-size-m: 1.5vw;
+}

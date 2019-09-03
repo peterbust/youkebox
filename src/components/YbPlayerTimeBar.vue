@@ -111,7 +111,7 @@ export default {
   right: 0;
   bottom: -2%;
   color: var(--color-white);
-  font-family: var(--font-light);
+  font-family: var(--font-regular);
   font-size: var(--font-size-m);
 }
 </style>
