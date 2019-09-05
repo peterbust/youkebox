@@ -55,7 +55,6 @@ export default {
      */
     fetchQueue() {
       store.dispatch('fetchData', { type: 'queue' })
-      store.dispatch('checkInQueueForUndisabled')
       setTimeout(() => this.fetchQueue(), 5000)
     },
   },

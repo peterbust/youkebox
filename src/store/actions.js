@@ -45,10 +45,11 @@ export default {
    * Fetch data from API and commit mutation to update state
    * @param {string} payload.type Type of data to fetch
    */
-  fetchData({ commit }, payload) {
+  fetchData({ dispatch, commit }, payload) {
     axios.get(api.get[payload.type])
       .then((response) => {
         commit('overwriteData', { property: payload.type, data: response.data })
+        dispatch('checkInQueueForUndisabled')
       })
       .catch(() => {
         console.error(`Oops, something went wrong requesting ${payload.type}.`)
